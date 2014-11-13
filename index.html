@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="last-modified" content="2014-11-13T22:58:50.8432073+01:00" />
+    <meta name="keywords" content="" />
+    <title>Snow Byte</title>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/font-awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
+    <link rel="canonical" href="http://bojanv91.github.io/" />
+</head>
+<body class="home blog">
+    <div id="page" class="hfeed site">
+        <header id="masthead" class="site-header" role="banner">
+            <hgroup>
+                <h1 class="site-title"><a href="/" title="Snow Byte" rel="home">Snow Byte</a>
+                <p><small>Minimal Sandra.Snow Theme.</small></p></h1>
+            </hgroup>
+            <nav role="navigation" class="site-navigation main-navigation">
+                <h1 class="assistive-text">Menu</h1>
+                <div class="assistive-text skip-link"><a href="#content" title="Skip to content">Skip to content</a></div>
+                <div class="menu">
+                    <ul>
+                        <li><a href="/" class="home"><i class="fa fa-home"></i></a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/category">Categories</a></li>
+                        <li><a href="/archive">Archive</a></li>
+                        <li><a href="/rss.xml">RSS</a></li>
+                        <li><a href="/feed.xml">Atom</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <div id="main">
+            <div id="primary" class="site-content">
+                <div id="content" role="main">
+                  
+
+  <ul class="posts">
+    <li class="post">
+      <h1><a href="/2014/11/database-development-guidance/">Database Development Guidance - Schema Creation, Migration, Automation, Versioning</a></h1> 
+      <div class="meta">
+        <p class="posted">13 Nov 2014</p>
+        <ul class="categories">
+        </ul>
+      </div>
+      
+      <h2>Database Development Guidance - Schema Creation, Migration, Automation, Versioning</h2>
+
+<p>TODO:
+http://www.informatica.com/se/Images/02241<em>data-migration-baseline-deployment</em>ips_en-US.pdf
+https://github.com/schambers/fluentmigrator/wiki/Enforce-migration-version-numbering-rules</p>
+
+<p>I had several goals in mind before choosing FluentMigrator as the primary database migration tool. So here they are:</p>
+
+<ul>
+<li>New developers in project should be able to build the entire database in their local system with a single click</li>
+<li>Altering the database schema should be versioned </li>
+<li>Version tracking of the underlying database</li>
+<li>Upgrading and migrating the database should be done automatically</li>
+<li>Schema creation should be database provider agnostic - same schema should be able to be deployed to MSSQL, PostgreSql and MYSQL</li>
+</ul>
+
+<h3>Database development process overtime sketches</h3>
+
+<h2>Step by step guide</h2>
+
+<h3>1. Create New Class Library Project</h3>
+
+<p><img src="images/2014-11-13-database-development-guidance/dbschema-001.png" alt="" /> </p>
+
+<h3>2. Install-Package FluentMigrator</h3>
+
+<h3>3. Create new folder "Migrations" to project - here we gonna store migration files</h3>
+
+<h3>4. Create new class "Baseline.cs" - the life of the database starts from this class</h3>
+
+<p>For demonstration purpose we are going to build database schema for basic RoomScheduler system.
+The baseline script will contain all initial tables and columns that our system needs. So, I am going to create 2 tables - Room and Person. </p>
+
+<pre><code>    using System;
+    using FluentMigrator;
+
+    namespace RoomScheduler.DatabaseMigrations.Migrations
+    {
+        [Migration(0)]
+        public class Baseline : Migration
+        {
+            /// &lt;summary&gt;
+            /// Executes when upgrading the database to higher version
+            /// &lt;/summary&gt;
+            public override void Up()
+            {
+                Create.Table("Room")
+                    .WithColumn("Id").AsInt32().NotNullable().PrimaryKey()
+                    .WithColumn("DateCreated").AsDateTime().NotNullable()
+                    .WithColumn("Name").AsString(50).NotNullable();
+
+                Create.Table("Person")
+                    .WithColumn("Id").AsInt32().NotNullable().PrimaryKey()
+                    .WithColumn("DateCreated").AsDateTime().NotNullable()
+                    .WithColumn("FirstName").AsString(50).NotNullable()
+                    .WithColumn("LastName").AsString(50).NotNullable()
+                    .WithColumn("ImgSrc").AsString(50).NotNullable();
+            }
+
+            /// &lt;summary&gt;
+            /// Executes when downgrading the database from higher version to lower version
+            /// &lt;/summary&gt;
+            public override void Down()
+            {
+                throw new NotImplementedException();
+            }
+        }
+    }
+</code></pre>
+
+<p>I like fluently written code. Pretty nice, huh? At this point of time I consider the "Down" process not providing enough value for the effort required. So we are going to write code in there.
+When we want to go down few levels with the db versions, we are going to rebuild the whole database from Baseline to the latest version. In future if our database scripts grow so so much, then I might consider writing down code for some of the latest scripts. </p>
+
+<p>Next, let's initialize the database with our script. </p>
+
+<h3>5. Create MSBuild Migration Runner (MSBuildMigrationRunner.proj)</h3>
+
+<p>This is my basic "bare-bones" MSBuild migration runner. More about other migration runners can be found in the <a href="https://github.com/schambers/fluentmigrator/wiki/Migration-Runners" title="official documentation">official documentation</a>.</p>
+
+<pre><code>&lt;?xml version="1.0"?&gt;
+&lt;Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Migrate"&gt;
+
+    &lt;PropertyGroup&gt;
+        &lt;MigratorTasksDirectory&gt;$(MSBuildProjectDirectory)\..\Solution-RoomScheduler\packages\FluentMigrator.1.3.0.0\tools\&lt;/MigratorTasksDirectory&gt;
+        &lt;DatabaseProvider&gt;SqlServer2012&lt;/DatabaseProvider&gt;
+        &lt;ConnectionStringName&gt;Default&lt;/ConnectionStringName&gt;
+        &lt;ConnectionStringConfigPath&gt;ConnectionStrings.Local.config&lt;/ConnectionStringConfigPath&gt;
+        &lt;DataMigrationProjectBuildDLL&gt;$(MSBuildProjectDirectory)\..\Solution-RoomScheduler\RoomScheduler.DatabaseMigrations\bin\Debug\RoomScheduler.DatabaseMigrations.dll&lt;/DataMigrationProjectBuildDLL&gt;
+        &lt;DataMigrationProjectCsproj&gt;$(MSBuildProjectDirectory)\..\Solution-RoomScheduler\RoomScheduler.DatabaseMigrations\RoomScheduler.DatabaseMigrations.csproj&lt;/DataMigrationProjectCsproj&gt;
+    &lt;/PropertyGroup&gt;
+
+    &lt;UsingTask TaskName="FluentMigrator.MSBuild.Migrate" AssemblyFile="$(MigratorTasksDirectory)FluentMigrator.MSBuild.dll"/&gt;
+
+    &lt;Target Name="Build"&gt;
+        &lt;MSBuild Projects="$(DataMigrationProjectCsproj)" Properties="Configuration=Debug"/&gt;
+    &lt;/Target&gt;
+
+    &lt;Target Name="Migrate" DependsOnTargets="Build"&gt;
+        &lt;Message Text="Starting FluentMigrator Migration"/&gt;
+        &lt;Migrate Database="$(DatabaseProvider)"
+                 Connection="$(ConnectionStringName)"
+                 ConnectionStringConfigPath="$(ConnectionStringConfigPath)"
+                 Target="$(DataMigrationProjectBuildDLL)"
+                 Output="True"
+                 Verbose="True"&gt;
+        &lt;/Migrate&gt;
+    &lt;/Target&gt;
+
+    &lt;Target Name="MigratePreview" DependsOnTargets="Build"&gt;
+        &lt;Message Text="Previewing FluentMigrator Migration"/&gt;
+        &lt;Migrate Database="$(DatabaseProvider)"
+                 Connection="$(ConnectionStringName)"
+                 ConnectionStringConfigPath="$(ConnectionStringConfigPath)"
+                 Target="$(DataMigrationProjectBuildDLL)"
+                 Output="True"
+                 Verbose="True"
+                 PreviewOnly="True"&gt;
+        &lt;/Migrate&gt;
+    &lt;/Target&gt;
+
+    &lt;Target Name="MigrateRollbackAll" DependsOnTargets="Build"&gt;
+        &lt;Message Text="Starting FluentMigrator Migration Rollback All"/&gt;
+        &lt;Migrate Database="$(DatabaseProvider)"
+                 Connection="$(ConnectionStringName)"
+                 ConnectionStringConfigPath="$(ConnectionStringConfigPath)"
+                 Target="$(MSBuildProjectDirectory)\bin\Debug\AjdeNaOdmor.DatabaseMigration.dll"
+                 Task="rollback:all"
+                 Output="True"
+                 Verbose="True"&gt;
+        &lt;/Migrate&gt;
+    &lt;/Target&gt;
+&lt;/Project&gt;
+</code></pre>
+
+<p>Probably you are asking where do I put this file and how my project structure is organized regarding this. Here is my project structure.</p>
+
+<p>IMAGE</p>
+
+<h3>6. Create .BAT script (MSBuildMigrator.Local.Migrate.bat) that would run MSBuildMigrationRunner.proj with suitable task</h3>
+
+<pre><code>C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe MSBuildMigrationRunner.proj /t:Migrate
+pause
+</code></pre>
+
+<p>We can also create one other script for running MigratePreview task.</p>
+
+<pre><code>C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe MSBuildMigrationRunner.proj /t:MigratePreview
+pause
+</code></pre>
+
+<h3>7. Execute the Migrate or MigratePreview .bat file</h3>
+
+<h2>Re-factoring the MSBuildMigration script and it's independence</h2>
+
+<p>Create ConnectionStrings.config in the root of the project and specify the connections strings there. From there it can be easily used everywhere it is needed across all projects. </p>
+
+<p>Source link: https://github.com/schambers/fluentmigrator/wiki<br />
+Documentation: https://github.com/schambers/fluentmigrator/wiki<br />
+MS Build community tasks: https://github.com/miroslavpopovic/msbuild-fluentmigrator/tree/master/tools/MSBuild%20Community%20Tasks
+http://www.codeproject.com/Articles/402430/Using-FluentMigrator-with-MSBuild</p>
+
+<h3>Summary</h3>
+
+      <p><a href="/2014/11/database-development-guidance/">Read more...</a></p>
+    </li>
+    <hr/>
+  </ul> 
+
+  <!-- Pagination links -->
+  <div id="post-pagination" class="pagination">
+
+   
+
+      <!--<a href="/">Previous Page</a>-->
+
+
+  </div>
+
+
+                </div>
+                <!-- #content -->
+            </div>
+            <!-- #primary .site-content -->
+        </div>
+        <!-- #main -->
+
+        <footer class="site-footer" role="contentinfo">
+            <div class="site-info">
+                Powered by <a href="https://github.com/Sandra/Sandra.Snow" rel="generator">Sandra.Snow</a>.	
+            </div>
+            <!-- .site-info -->
+        </footer>
+        <!-- #colophon .site-footer -->
+    </div>
+    <!-- #page .hfeed .site -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src='/javascripts/prettify.js' type='text/javascript'></script>
+    
+    <script type="text/javascript">
+var _gaq = _gaq || [];
+
+_gaq.push(['_setAccount', 'UA-######-##']);
+_gaq.push(['_trackPageview']);
+        
+(function () {
+    var ga = document.createElement('script');
+    ga.type = 'text/javascript';
+    ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(ga, s);
+})();
+</script>
+    
+    <script type='text/javascript'>
+      $(function () {
+        $("pre code").parent().each(function () {
+          if (!$(this).hasClass("prettyprint")) {
+            $(this).addClass("prettyprint");
+            a = true
+          }
+        });
+
+        prettyPrint();
+      });
+    </script>
+</body>
+</html>

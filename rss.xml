@@ -1,0 +1,325 @@
+<rss xmlns:a10="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Bojan Veljanovski's notes and thoughts on software</title><link>http://bojanv91.github.io/rss.xml</link><description>Bojan Veljanovski's notes and thoughts on software</description><item><guid isPermaLink="true">http://bojanv91.github.io/2014/11/database-development-guidance/</guid><link>http://bojanv91.github.io/2014/11/database-development-guidance/</link><title>Database Development Guidance - Schema Creation, Migration, Automation, Versioning</title><description>&lt;h2&gt;Database Development Guidance - Schema Creation, Migration, Automation, Versioning&lt;/h2&gt;
+
+&lt;p&gt;TODO:
+http://www.informatica.com/se/Images/02241&lt;em&gt;data-migration-baseline-deployment&lt;/em&gt;ips_en-US.pdf
+https://github.com/schambers/fluentmigrator/wiki/Enforce-migration-version-numbering-rules&lt;/p&gt;
+
+&lt;p&gt;I had several goals in mind before choosing FluentMigrator as the primary database migration tool. So here they are:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;New developers in project should be able to build the entire database in their local system with a single click&lt;/li&gt;
+&lt;li&gt;Altering the database schema should be versioned &lt;/li&gt;
+&lt;li&gt;Version tracking of the underlying database&lt;/li&gt;
+&lt;li&gt;Upgrading and migrating the database should be done automatically&lt;/li&gt;
+&lt;li&gt;Schema creation should be database provider agnostic - same schema should be able to be deployed to MSSQL, PostgreSql and MYSQL&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Database development process overtime sketches&lt;/h3&gt;
+
+&lt;h2&gt;Step by step guide&lt;/h2&gt;
+
+&lt;h3&gt;1. Create New Class Library Project&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-11-13-database-development-guidance/dbschema-001.png" alt="" /&gt; &lt;/p&gt;
+
+&lt;h3&gt;2. Install-Package FluentMigrator&lt;/h3&gt;
+
+&lt;h3&gt;3. Create new folder "Migrations" to project - here we gonna store migration files&lt;/h3&gt;
+
+&lt;h3&gt;4. Create new class "Baseline.cs" - the life of the database starts from this class&lt;/h3&gt;
+
+&lt;p&gt;For demonstration purpose we are going to build database schema for basic RoomScheduler system.
+The baseline script will contain all initial tables and columns that our system needs. So, I am going to create 2 tables - Room and Person. &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    using System;
+    using FluentMigrator;
+
+    namespace RoomScheduler.DatabaseMigrations.Migrations
+    {
+        [Migration(0)]
+        public class Baseline : Migration
+        {
+            /// &amp;lt;summary&amp;gt;
+            /// Executes when upgrading the database to higher version
+            /// &amp;lt;/summary&amp;gt;
+            public override void Up()
+            {
+                Create.Table("Room")
+                    .WithColumn("Id").AsInt32().NotNullable().PrimaryKey()
+                    .WithColumn("DateCreated").AsDateTime().NotNullable()
+                    .WithColumn("Name").AsString(50).NotNullable();
+
+                Create.Table("Person")
+                    .WithColumn("Id").AsInt32().NotNullable().PrimaryKey()
+                    .WithColumn("DateCreated").AsDateTime().NotNullable()
+                    .WithColumn("FirstName").AsString(50).NotNullable()
+                    .WithColumn("LastName").AsString(50).NotNullable()
+                    .WithColumn("ImgSrc").AsString(50).NotNullable();
+            }
+
+            /// &amp;lt;summary&amp;gt;
+            /// Executes when downgrading the database from higher version to lower version
+            /// &amp;lt;/summary&amp;gt;
+            public override void Down()
+            {
+                throw new NotImplementedException();
+            }
+        }
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I like fluently written code. Pretty nice, huh? At this point of time I consider the "Down" process not providing enough value for the effort required. So we are going to write code in there.
+When we want to go down few levels with the db versions, we are going to rebuild the whole database from Baseline to the latest version. In future if our database scripts grow so so much, then I might consider writing down code for some of the latest scripts. &lt;/p&gt;
+
+&lt;p&gt;Next, let's initialize the database with our script. &lt;/p&gt;
+
+&lt;h3&gt;5. Create MSBuild Migration Runner (MSBuildMigrationRunner.proj)&lt;/h3&gt;
+
+&lt;p&gt;This is my basic "bare-bones" MSBuild migration runner. More about other migration runners can be found in the &lt;a href="https://github.com/schambers/fluentmigrator/wiki/Migration-Runners" title="official documentation"&gt;official documentation&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;?xml version="1.0"?&amp;gt;
+&amp;lt;Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Migrate"&amp;gt;
+
+    &amp;lt;PropertyGroup&amp;gt;
+        &amp;lt;MigratorTasksDirectory&amp;gt;$(MSBuildProjectDirectory)\..\Solution-RoomScheduler\packages\FluentMigrator.1.3.0.0\tools\&amp;lt;/MigratorTasksDirectory&amp;gt;
+        &amp;lt;DatabaseProvider&amp;gt;SqlServer2012&amp;lt;/DatabaseProvider&amp;gt;
+        &amp;lt;ConnectionStringName&amp;gt;Default&amp;lt;/ConnectionStringName&amp;gt;
+        &amp;lt;ConnectionStringConfigPath&amp;gt;ConnectionStrings.Local.config&amp;lt;/ConnectionStringConfigPath&amp;gt;
+        &amp;lt;DataMigrationProjectBuildDLL&amp;gt;$(MSBuildProjectDirectory)\..\Solution-RoomScheduler\RoomScheduler.DatabaseMigrations\bin\Debug\RoomScheduler.DatabaseMigrations.dll&amp;lt;/DataMigrationProjectBuildDLL&amp;gt;
+        &amp;lt;DataMigrationProjectCsproj&amp;gt;$(MSBuildProjectDirectory)\..\Solution-RoomScheduler\RoomScheduler.DatabaseMigrations\RoomScheduler.DatabaseMigrations.csproj&amp;lt;/DataMigrationProjectCsproj&amp;gt;
+    &amp;lt;/PropertyGroup&amp;gt;
+
+    &amp;lt;UsingTask TaskName="FluentMigrator.MSBuild.Migrate" AssemblyFile="$(MigratorTasksDirectory)FluentMigrator.MSBuild.dll"/&amp;gt;
+
+    &amp;lt;Target Name="Build"&amp;gt;
+        &amp;lt;MSBuild Projects="$(DataMigrationProjectCsproj)" Properties="Configuration=Debug"/&amp;gt;
+    &amp;lt;/Target&amp;gt;
+
+    &amp;lt;Target Name="Migrate" DependsOnTargets="Build"&amp;gt;
+        &amp;lt;Message Text="Starting FluentMigrator Migration"/&amp;gt;
+        &amp;lt;Migrate Database="$(DatabaseProvider)"
+                 Connection="$(ConnectionStringName)"
+                 ConnectionStringConfigPath="$(ConnectionStringConfigPath)"
+                 Target="$(DataMigrationProjectBuildDLL)"
+                 Output="True"
+                 Verbose="True"&amp;gt;
+        &amp;lt;/Migrate&amp;gt;
+    &amp;lt;/Target&amp;gt;
+
+    &amp;lt;Target Name="MigratePreview" DependsOnTargets="Build"&amp;gt;
+        &amp;lt;Message Text="Previewing FluentMigrator Migration"/&amp;gt;
+        &amp;lt;Migrate Database="$(DatabaseProvider)"
+                 Connection="$(ConnectionStringName)"
+                 ConnectionStringConfigPath="$(ConnectionStringConfigPath)"
+                 Target="$(DataMigrationProjectBuildDLL)"
+                 Output="True"
+                 Verbose="True"
+                 PreviewOnly="True"&amp;gt;
+        &amp;lt;/Migrate&amp;gt;
+    &amp;lt;/Target&amp;gt;
+
+    &amp;lt;Target Name="MigrateRollbackAll" DependsOnTargets="Build"&amp;gt;
+        &amp;lt;Message Text="Starting FluentMigrator Migration Rollback All"/&amp;gt;
+        &amp;lt;Migrate Database="$(DatabaseProvider)"
+                 Connection="$(ConnectionStringName)"
+                 ConnectionStringConfigPath="$(ConnectionStringConfigPath)"
+                 Target="$(MSBuildProjectDirectory)\bin\Debug\AjdeNaOdmor.DatabaseMigration.dll"
+                 Task="rollback:all"
+                 Output="True"
+                 Verbose="True"&amp;gt;
+        &amp;lt;/Migrate&amp;gt;
+    &amp;lt;/Target&amp;gt;
+&amp;lt;/Project&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Probably you are asking where do I put this file and how my project structure is organized regarding this. Here is my project structure.&lt;/p&gt;
+
+&lt;p&gt;IMAGE&lt;/p&gt;
+
+&lt;h3&gt;6. Create .BAT script (MSBuildMigrator.Local.Migrate.bat) that would run MSBuildMigrationRunner.proj with suitable task&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe MSBuildMigrationRunner.proj /t:Migrate
+pause
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can also create one other script for running MigratePreview task.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe MSBuildMigrationRunner.proj /t:MigratePreview
+pause
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;7. Execute the Migrate or MigratePreview .bat file&lt;/h3&gt;
+
+&lt;h2&gt;Re-factoring the MSBuildMigration script and it's independence&lt;/h2&gt;
+
+&lt;p&gt;Create ConnectionStrings.config in the root of the project and specify the connections strings there. From there it can be easily used everywhere it is needed across all projects. &lt;/p&gt;
+
+&lt;p&gt;Source link: https://github.com/schambers/fluentmigrator/wiki&lt;br /&gt;
+Documentation: https://github.com/schambers/fluentmigrator/wiki&lt;br /&gt;
+MS Build community tasks: https://github.com/miroslavpopovic/msbuild-fluentmigrator/tree/master/tools/MSBuild%20Community%20Tasks
+http://www.codeproject.com/Articles/402430/Using-FluentMigrator-with-MSBuild&lt;/p&gt;
+
+&lt;h3&gt;Summary&lt;/h3&gt;
+</description><pubDate>Wed, 12 Nov 2014 23:00:00 Z</pubDate><a10:updated>2014-11-12T23:00:00Z</a10:updated><a10:content type="html">&lt;h2&gt;Database Development Guidance - Schema Creation, Migration, Automation, Versioning&lt;/h2&gt;
+
+&lt;p&gt;TODO:
+http://www.informatica.com/se/Images/02241&lt;em&gt;data-migration-baseline-deployment&lt;/em&gt;ips_en-US.pdf
+https://github.com/schambers/fluentmigrator/wiki/Enforce-migration-version-numbering-rules&lt;/p&gt;
+
+&lt;p&gt;I had several goals in mind before choosing FluentMigrator as the primary database migration tool. So here they are:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;New developers in project should be able to build the entire database in their local system with a single click&lt;/li&gt;
+&lt;li&gt;Altering the database schema should be versioned &lt;/li&gt;
+&lt;li&gt;Version tracking of the underlying database&lt;/li&gt;
+&lt;li&gt;Upgrading and migrating the database should be done automatically&lt;/li&gt;
+&lt;li&gt;Schema creation should be database provider agnostic - same schema should be able to be deployed to MSSQL, PostgreSql and MYSQL&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;Database development process overtime sketches&lt;/h3&gt;
+
+&lt;h2&gt;Step by step guide&lt;/h2&gt;
+
+&lt;h3&gt;1. Create New Class Library Project&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-11-13-database-development-guidance/dbschema-001.png" alt="" /&gt; &lt;/p&gt;
+
+&lt;h3&gt;2. Install-Package FluentMigrator&lt;/h3&gt;
+
+&lt;h3&gt;3. Create new folder "Migrations" to project - here we gonna store migration files&lt;/h3&gt;
+
+&lt;h3&gt;4. Create new class "Baseline.cs" - the life of the database starts from this class&lt;/h3&gt;
+
+&lt;p&gt;For demonstration purpose we are going to build database schema for basic RoomScheduler system.
+The baseline script will contain all initial tables and columns that our system needs. So, I am going to create 2 tables - Room and Person. &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    using System;
+    using FluentMigrator;
+
+    namespace RoomScheduler.DatabaseMigrations.Migrations
+    {
+        [Migration(0)]
+        public class Baseline : Migration
+        {
+            /// &amp;lt;summary&amp;gt;
+            /// Executes when upgrading the database to higher version
+            /// &amp;lt;/summary&amp;gt;
+            public override void Up()
+            {
+                Create.Table("Room")
+                    .WithColumn("Id").AsInt32().NotNullable().PrimaryKey()
+                    .WithColumn("DateCreated").AsDateTime().NotNullable()
+                    .WithColumn("Name").AsString(50).NotNullable();
+
+                Create.Table("Person")
+                    .WithColumn("Id").AsInt32().NotNullable().PrimaryKey()
+                    .WithColumn("DateCreated").AsDateTime().NotNullable()
+                    .WithColumn("FirstName").AsString(50).NotNullable()
+                    .WithColumn("LastName").AsString(50).NotNullable()
+                    .WithColumn("ImgSrc").AsString(50).NotNullable();
+            }
+
+            /// &amp;lt;summary&amp;gt;
+            /// Executes when downgrading the database from higher version to lower version
+            /// &amp;lt;/summary&amp;gt;
+            public override void Down()
+            {
+                throw new NotImplementedException();
+            }
+        }
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I like fluently written code. Pretty nice, huh? At this point of time I consider the "Down" process not providing enough value for the effort required. So we are going to write code in there.
+When we want to go down few levels with the db versions, we are going to rebuild the whole database from Baseline to the latest version. In future if our database scripts grow so so much, then I might consider writing down code for some of the latest scripts. &lt;/p&gt;
+
+&lt;p&gt;Next, let's initialize the database with our script. &lt;/p&gt;
+
+&lt;h3&gt;5. Create MSBuild Migration Runner (MSBuildMigrationRunner.proj)&lt;/h3&gt;
+
+&lt;p&gt;This is my basic "bare-bones" MSBuild migration runner. More about other migration runners can be found in the &lt;a href="https://github.com/schambers/fluentmigrator/wiki/Migration-Runners" title="official documentation"&gt;official documentation&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;?xml version="1.0"?&amp;gt;
+&amp;lt;Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Migrate"&amp;gt;
+
+    &amp;lt;PropertyGroup&amp;gt;
+        &amp;lt;MigratorTasksDirectory&amp;gt;$(MSBuildProjectDirectory)\..\Solution-RoomScheduler\packages\FluentMigrator.1.3.0.0\tools\&amp;lt;/MigratorTasksDirectory&amp;gt;
+        &amp;lt;DatabaseProvider&amp;gt;SqlServer2012&amp;lt;/DatabaseProvider&amp;gt;
+        &amp;lt;ConnectionStringName&amp;gt;Default&amp;lt;/ConnectionStringName&amp;gt;
+        &amp;lt;ConnectionStringConfigPath&amp;gt;ConnectionStrings.Local.config&amp;lt;/ConnectionStringConfigPath&amp;gt;
+        &amp;lt;DataMigrationProjectBuildDLL&amp;gt;$(MSBuildProjectDirectory)\..\Solution-RoomScheduler\RoomScheduler.DatabaseMigrations\bin\Debug\RoomScheduler.DatabaseMigrations.dll&amp;lt;/DataMigrationProjectBuildDLL&amp;gt;
+        &amp;lt;DataMigrationProjectCsproj&amp;gt;$(MSBuildProjectDirectory)\..\Solution-RoomScheduler\RoomScheduler.DatabaseMigrations\RoomScheduler.DatabaseMigrations.csproj&amp;lt;/DataMigrationProjectCsproj&amp;gt;
+    &amp;lt;/PropertyGroup&amp;gt;
+
+    &amp;lt;UsingTask TaskName="FluentMigrator.MSBuild.Migrate" AssemblyFile="$(MigratorTasksDirectory)FluentMigrator.MSBuild.dll"/&amp;gt;
+
+    &amp;lt;Target Name="Build"&amp;gt;
+        &amp;lt;MSBuild Projects="$(DataMigrationProjectCsproj)" Properties="Configuration=Debug"/&amp;gt;
+    &amp;lt;/Target&amp;gt;
+
+    &amp;lt;Target Name="Migrate" DependsOnTargets="Build"&amp;gt;
+        &amp;lt;Message Text="Starting FluentMigrator Migration"/&amp;gt;
+        &amp;lt;Migrate Database="$(DatabaseProvider)"
+                 Connection="$(ConnectionStringName)"
+                 ConnectionStringConfigPath="$(ConnectionStringConfigPath)"
+                 Target="$(DataMigrationProjectBuildDLL)"
+                 Output="True"
+                 Verbose="True"&amp;gt;
+        &amp;lt;/Migrate&amp;gt;
+    &amp;lt;/Target&amp;gt;
+
+    &amp;lt;Target Name="MigratePreview" DependsOnTargets="Build"&amp;gt;
+        &amp;lt;Message Text="Previewing FluentMigrator Migration"/&amp;gt;
+        &amp;lt;Migrate Database="$(DatabaseProvider)"
+                 Connection="$(ConnectionStringName)"
+                 ConnectionStringConfigPath="$(ConnectionStringConfigPath)"
+                 Target="$(DataMigrationProjectBuildDLL)"
+                 Output="True"
+                 Verbose="True"
+                 PreviewOnly="True"&amp;gt;
+        &amp;lt;/Migrate&amp;gt;
+    &amp;lt;/Target&amp;gt;
+
+    &amp;lt;Target Name="MigrateRollbackAll" DependsOnTargets="Build"&amp;gt;
+        &amp;lt;Message Text="Starting FluentMigrator Migration Rollback All"/&amp;gt;
+        &amp;lt;Migrate Database="$(DatabaseProvider)"
+                 Connection="$(ConnectionStringName)"
+                 ConnectionStringConfigPath="$(ConnectionStringConfigPath)"
+                 Target="$(MSBuildProjectDirectory)\bin\Debug\AjdeNaOdmor.DatabaseMigration.dll"
+                 Task="rollback:all"
+                 Output="True"
+                 Verbose="True"&amp;gt;
+        &amp;lt;/Migrate&amp;gt;
+    &amp;lt;/Target&amp;gt;
+&amp;lt;/Project&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Probably you are asking where do I put this file and how my project structure is organized regarding this. Here is my project structure.&lt;/p&gt;
+
+&lt;p&gt;IMAGE&lt;/p&gt;
+
+&lt;h3&gt;6. Create .BAT script (MSBuildMigrator.Local.Migrate.bat) that would run MSBuildMigrationRunner.proj with suitable task&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe MSBuildMigrationRunner.proj /t:Migrate
+pause
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can also create one other script for running MigratePreview task.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe MSBuildMigrationRunner.proj /t:MigratePreview
+pause
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3&gt;7. Execute the Migrate or MigratePreview .bat file&lt;/h3&gt;
+
+&lt;h2&gt;Re-factoring the MSBuildMigration script and it's independence&lt;/h2&gt;
+
+&lt;p&gt;Create ConnectionStrings.config in the root of the project and specify the connections strings there. From there it can be easily used everywhere it is needed across all projects. &lt;/p&gt;
+
+&lt;p&gt;Source link: https://github.com/schambers/fluentmigrator/wiki&lt;br /&gt;
+Documentation: https://github.com/schambers/fluentmigrator/wiki&lt;br /&gt;
+MS Build community tasks: https://github.com/miroslavpopovic/msbuild-fluentmigrator/tree/master/tools/MSBuild%20Community%20Tasks
+http://www.codeproject.com/Articles/402430/Using-FluentMigrator-with-MSBuild&lt;/p&gt;
+
+&lt;h3&gt;Summary&lt;/h3&gt;
+</a10:content></item></channel></rss>

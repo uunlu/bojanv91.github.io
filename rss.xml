@@ -24,6 +24,8 @@ https://github.com/schambers/fluentmigrator/wiki/Enforce-migration-version-numbe
 
 &lt;h3&gt;2. Install-Package FluentMigrator&lt;/h3&gt;
 
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-11-13-database-development-guidance/dbschema-002.png" alt="" /&gt; &lt;/p&gt;
+
 &lt;h3&gt;3. Create new folder "Migrations" to project - here we gonna store migration files&lt;/h3&gt;
 
 &lt;h3&gt;4. Create new class "Baseline.cs" - the life of the database starts from this class&lt;/h3&gt;
@@ -134,7 +136,7 @@ When we want to go down few levels with the db versions, we are going to rebuild
 
 &lt;p&gt;Probably you are asking where do I put this file and how my project structure is organized regarding this. Here is my project structure.&lt;/p&gt;
 
-&lt;p&gt;IMAGE&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-11-13-database-development-guidance/dbschema-003.png" alt="" /&gt; &lt;/p&gt;
 
 &lt;h3&gt;6. Create .BAT script (MSBuildMigrator.Local.Migrate.bat) that would run MSBuildMigrationRunner.proj with suitable task&lt;/h3&gt;
 
@@ -150,16 +152,24 @@ pause
 
 &lt;h3&gt;7. Execute the Migrate or MigratePreview .bat file&lt;/h3&gt;
 
-&lt;h2&gt;Re-factoring the MSBuildMigration script and it's independence&lt;/h2&gt;
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-11-13-database-development-guidance/dbschema-004.png" alt="" /&gt;&lt;/p&gt;
 
-&lt;p&gt;Create ConnectionStrings.config in the root of the project and specify the connections strings there. From there it can be easily used everywhere it is needed across all projects. &lt;/p&gt;
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-11-13-database-development-guidance/dbschema-005.png" alt="" /&gt;&lt;/p&gt;
+
+&lt;p&gt;And from what can been see, all tables are being created plus one additional table called VersionInfo, which is used for storing migration metadata.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-11-13-database-development-guidance/dbschema-006.png" alt="" /&gt;&lt;/p&gt;
+
+&lt;h3&gt;Summary&lt;/h3&gt;
+
+&lt;p&gt;Next  Re-factoring the MSBuildMigration script for better automation integration&lt;/p&gt;
+
+&lt;hr /&gt;
 
 &lt;p&gt;Source link: https://github.com/schambers/fluentmigrator/wiki&lt;br /&gt;
 Documentation: https://github.com/schambers/fluentmigrator/wiki&lt;br /&gt;
 MS Build community tasks: https://github.com/miroslavpopovic/msbuild-fluentmigrator/tree/master/tools/MSBuild%20Community%20Tasks
 http://www.codeproject.com/Articles/402430/Using-FluentMigrator-with-MSBuild&lt;/p&gt;
-
-&lt;h3&gt;Summary&lt;/h3&gt;
 </description><pubDate>Wed, 12 Nov 2014 23:00:00 Z</pubDate><a10:updated>2014-11-12T23:00:00Z</a10:updated><a10:content type="html">&lt;h2&gt;Database Development Guidance - Schema Creation, Migration, Automation, Versioning&lt;/h2&gt;
 
 &lt;p&gt;TODO:
@@ -186,6 +196,8 @@ https://github.com/schambers/fluentmigrator/wiki/Enforce-migration-version-numbe
 
 &lt;h3&gt;2. Install-Package FluentMigrator&lt;/h3&gt;
 
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-11-13-database-development-guidance/dbschema-002.png" alt="" /&gt; &lt;/p&gt;
+
 &lt;h3&gt;3. Create new folder "Migrations" to project - here we gonna store migration files&lt;/h3&gt;
 
 &lt;h3&gt;4. Create new class "Baseline.cs" - the life of the database starts from this class&lt;/h3&gt;
@@ -296,7 +308,7 @@ When we want to go down few levels with the db versions, we are going to rebuild
 
 &lt;p&gt;Probably you are asking where do I put this file and how my project structure is organized regarding this. Here is my project structure.&lt;/p&gt;
 
-&lt;p&gt;IMAGE&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-11-13-database-development-guidance/dbschema-003.png" alt="" /&gt; &lt;/p&gt;
 
 &lt;h3&gt;6. Create .BAT script (MSBuildMigrator.Local.Migrate.bat) that would run MSBuildMigrationRunner.proj with suitable task&lt;/h3&gt;
 
@@ -312,14 +324,22 @@ pause
 
 &lt;h3&gt;7. Execute the Migrate or MigratePreview .bat file&lt;/h3&gt;
 
-&lt;h2&gt;Re-factoring the MSBuildMigration script and it's independence&lt;/h2&gt;
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-11-13-database-development-guidance/dbschema-004.png" alt="" /&gt;&lt;/p&gt;
 
-&lt;p&gt;Create ConnectionStrings.config in the root of the project and specify the connections strings there. From there it can be easily used everywhere it is needed across all projects. &lt;/p&gt;
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-11-13-database-development-guidance/dbschema-005.png" alt="" /&gt;&lt;/p&gt;
+
+&lt;p&gt;And from what can been see, all tables are being created plus one additional table called VersionInfo, which is used for storing migration metadata.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-11-13-database-development-guidance/dbschema-006.png" alt="" /&gt;&lt;/p&gt;
+
+&lt;h3&gt;Summary&lt;/h3&gt;
+
+&lt;p&gt;Next  Re-factoring the MSBuildMigration script for better automation integration&lt;/p&gt;
+
+&lt;hr /&gt;
 
 &lt;p&gt;Source link: https://github.com/schambers/fluentmigrator/wiki&lt;br /&gt;
 Documentation: https://github.com/schambers/fluentmigrator/wiki&lt;br /&gt;
 MS Build community tasks: https://github.com/miroslavpopovic/msbuild-fluentmigrator/tree/master/tools/MSBuild%20Community%20Tasks
 http://www.codeproject.com/Articles/402430/Using-FluentMigrator-with-MSBuild&lt;/p&gt;
-
-&lt;h3&gt;Summary&lt;/h3&gt;
 </a10:content></item></channel></rss>

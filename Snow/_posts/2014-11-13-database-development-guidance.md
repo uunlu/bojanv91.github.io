@@ -29,6 +29,8 @@ I had several goals in mind before choosing FluentMigrator as the primary databa
 
 ### 2. Install-Package FluentMigrator
 
+![](images/2014-11-13-database-development-guidance/dbschema-002.png) 
+
 ### 3. Create new folder "Migrations" to project - here we gonna store migration files
  
 ### 4. Create new class "Baseline.cs" - the life of the database starts from this class
@@ -138,7 +140,7 @@ This is my basic "bare-bones" MSBuild migration runner. More about other migrati
 
 Probably you are asking where do I put this file and how my project structure is organized regarding this. Here is my project structure.
 
-IMAGE
+![](images/2014-11-13-database-development-guidance/dbschema-003.png) 
 
 ### 6. Create .BAT script (MSBuildMigrator.Local.Migrate.bat) that would run MSBuildMigrationRunner.proj with suitable task
 
@@ -152,19 +154,25 @@ We can also create one other script for running MigratePreview task.
 
 ### 7. Execute the Migrate or MigratePreview .bat file
 
+![](images/2014-11-13-database-development-guidance/dbschema-004.png)
 
-## Re-factoring the MSBuildMigration script and it's independence
+![](images/2014-11-13-database-development-guidance/dbschema-005.png)
 
-Create ConnectionStrings.config in the root of the project and specify the connections strings there. From there it can be easily used everywhere it is needed across all projects. 
+
+And from what can been see, all tables are being created plus one additional table called VersionInfo, which is used for storing migration metadata.
+
+![](images/2014-11-13-database-development-guidance/dbschema-006.png)
+
+### Summary
+
+Next  Re-factoring the MSBuildMigration script for better automation integration
+
+--- 
 
 
 Source link: https://github.com/schambers/fluentmigrator/wiki  
 Documentation: https://github.com/schambers/fluentmigrator/wiki  
 MS Build community tasks: https://github.com/miroslavpopovic/msbuild-fluentmigrator/tree/master/tools/MSBuild%20Community%20Tasks
 http://www.codeproject.com/Articles/402430/Using-FluentMigrator-with-MSBuild
-
-
-### Summary
-
 
 

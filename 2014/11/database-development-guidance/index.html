@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <meta http-equiv="last-modified" content="2014-11-13T22:58:50.8432073+01:00" />
+    <meta http-equiv="last-modified" content="2014-11-24T14:22:41.8410835+01:00" />
     <meta name="keywords" content="" />
     <title>Snow Byte</title>
     <link rel="stylesheet" type="text/css" href="/stylesheets/font-awesome/css/font-awesome.min.css" />
@@ -82,6 +82,8 @@ https://github.com/schambers/fluentmigrator/wiki/Enforce-migration-version-numbe
 <p><img src="images/2014-11-13-database-development-guidance/dbschema-001.png" alt="" /> </p>
 
 <h3>2. Install-Package FluentMigrator</h3>
+
+<p><img src="images/2014-11-13-database-development-guidance/dbschema-002.png" alt="" /> </p>
 
 <h3>3. Create new folder "Migrations" to project - here we gonna store migration files</h3>
 
@@ -193,7 +195,7 @@ When we want to go down few levels with the db versions, we are going to rebuild
 
 <p>Probably you are asking where do I put this file and how my project structure is organized regarding this. Here is my project structure.</p>
 
-<p>IMAGE</p>
+<p><img src="images/2014-11-13-database-development-guidance/dbschema-003.png" alt="" /> </p>
 
 <h3>6. Create .BAT script (MSBuildMigrator.Local.Migrate.bat) that would run MSBuildMigrationRunner.proj with suitable task</h3>
 
@@ -209,16 +211,24 @@ pause
 
 <h3>7. Execute the Migrate or MigratePreview .bat file</h3>
 
-<h2>Re-factoring the MSBuildMigration script and it's independence</h2>
+<p><img src="images/2014-11-13-database-development-guidance/dbschema-004.png" alt="" /></p>
 
-<p>Create ConnectionStrings.config in the root of the project and specify the connections strings there. From there it can be easily used everywhere it is needed across all projects. </p>
+<p><img src="images/2014-11-13-database-development-guidance/dbschema-005.png" alt="" /></p>
+
+<p>And from what can been see, all tables are being created plus one additional table called VersionInfo, which is used for storing migration metadata.</p>
+
+<p><img src="images/2014-11-13-database-development-guidance/dbschema-006.png" alt="" /></p>
+
+<h3>Summary</h3>
+
+<p>Next  Re-factoring the MSBuildMigration script for better automation integration</p>
+
+<hr />
 
 <p>Source link: https://github.com/schambers/fluentmigrator/wiki<br />
 Documentation: https://github.com/schambers/fluentmigrator/wiki<br />
 MS Build community tasks: https://github.com/miroslavpopovic/msbuild-fluentmigrator/tree/master/tools/MSBuild%20Community%20Tasks
 http://www.codeproject.com/Articles/402430/Using-FluentMigrator-with-MSBuild</p>
-
-<h3>Summary</h3>
 
 
     <div id="disqus_thread"></div>

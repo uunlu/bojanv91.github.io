@@ -3,7 +3,7 @@ layout: post
 title: Database Development Guide for .NET dev teams with Fluent Migrator
 ---
 
-## Intent
+# Intent
 
 - Auditing schema changes
 - Auditing test data changes
@@ -13,23 +13,23 @@ title: Database Development Guide for .NET dev teams with Fluent Migrator
 - Simple and automated migration strategy (local and in production)
 - New developers on project should not sweat while making the database work on their machines, neither the CI server   
 
-Links to [Fluent Migrator]([https://github.com/schambers/fluentmigrator/wiki](https://github.com/schambers/fluentmigrator/wiki)) and [example project used in this guide](http://github).
+Links to [Fluent Migrator](https://github.com/schambers/fluentmigrator/wiki)) and [example project used in this guide](https://github.com/bojanv91/DatabaseMigrationsExample).
 
-## Step by step guide into creation of the development strategy (you will need approx 15 min)
+# Step by step guide into creation of the development strategy (you will need approx 15 min)
 
-### 1. Open Visual Studio and create New Class Library Project
+## 1. Open Visual Studio and create New Class Library Project
 
-![](images/2014-11-13-database-development-guidance/img01.png) 
+![](images/2014-12-12-database-development-guidance/img01.png) 
 
-### 2. Install-Package FluentMigrator
+## 2. Install-Package FluentMigrator
 
-![](images/2014-11-13-database-development-guidance/img02.png)
+![](images/2014-12-12-database-development-guidance/img02.png)
 
-### 3. Create new folder "Migrations" to project - here we are going to store migration files
+## 3. Create new folder "Migrations" to project - here we are going to store migration files
 
-![](images/2014-11-13-database-development-guidance/img03.png)
+![](images/2014-12-12-database-development-guidance/img03.png)
  
-### 4. Now, let's create database tables with migration files
+## 4. Now, let's create database tables with migration files
 
     [FluentMigrator.Migration(0)]
     public class Baseline : FluentMigrator.Migration
@@ -76,15 +76,15 @@ Just for providing more examples I have added one more migration file for adding
 
 Now this is how everything looks in my solution.
 
-![](images/2014-11-13-database-development-guidance/img04.png)
+![](images/2014-12-12-database-development-guidance/img04.png)
 
 Next, let's initialize the database with our script. 
 
-### 5. Creating Migration Runner (MSBuild), Migrator (.BAT) and ConnectionStrings (.CONFIG)
+## 5. Creating Migration Runner (MSBuild), Migrator (.BAT) and ConnectionStrings (.CONFIG)
 
-![](images/2014-11-13-database-development-guidance/img05.png)
+![](images/2014-12-12-database-development-guidance/img05.png)
 
-#### 1. MSBuildMigrationRunner.proj
+### 1. MSBuildMigrationRunner.proj
 
 		<?xml version="1.0"?>
 		<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Migrate">
@@ -130,7 +130,7 @@ Next, let's initialize the database with our script.
 			</Target>
 		</Project>
 
-#### 2. ConnectionStrings.config
+### 2. ConnectionStrings.config
 
 		<?xml version="1.0" encoding="utf-8" ?>
 		<configuration>
@@ -141,7 +141,7 @@ Next, let's initialize the database with our script.
 		</configuration>
 
 
-#### 3. MSBuildMigrator.Migrate.bat
+### 3. MSBuildMigrator.Migrate.bat
 
 		C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe MSBuildMigrationRunner.proj /t:Migrate /p:DatabaseProvider=SqlServer2012 /p:ConnectionStringConfigPath=ConnectionStrings.config /p:ConnectionStringName=Default /p:DataMigrationProjectName=DatabaseMigrationsExample /p:DataMigrationProjectRootPath=. /p:MigratorTasksDirectory=..\packages\FluentMigrator.1.3.1.0\tools\
 		pause
@@ -149,23 +149,23 @@ Next, let's initialize the database with our script.
 
 Viola, this is all you need to do. For your project you will need to put the connection string to your database and make changes where needed in the .BAT file, such as database provider and project name as an essential changes. Other config stuff should be pretty common, but if you have different structure than mine, you have full power and control with the flexibility provided here.
 
-### 5. Run your MSBuildMigrator.Migrate.bat file
+## 5. Run your MSBuildMigrator.Migrate.bat file
 
-![](images/2014-11-13-database-development-guidance/img06.png)
+![](images/2014-12-12-database-development-guidance/img06.png)
 
 Table VersionInfo is used for storing migration metadata.
 
-![](images/2014-11-13-database-development-guidance/img07.png)
+![](images/2014-12-12-database-development-guidance/img07.png)
 
 All of our tables are created.
 
-![](images/2014-11-13-database-development-guidance/img08.png)
+![](images/2014-12-12-database-development-guidance/img08.png)
 
 In VersionInfo table you can see the "commits".
 
-![](images/2014-11-13-database-development-guidance/img09.png)
+![](images/2014-12-12-database-development-guidance/img09.png)
 
-## Rules of Thumb
+# Rules of Thumb
 
 - First migration is always called "BaseLine" with migration ID: 0. Everything starts from there.
 - Migration unique identification number is composed of current datetime when the migration is being created in format #yyyyMMddhhmm#  

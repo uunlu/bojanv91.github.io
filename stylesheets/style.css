@@ -1,5 +1,3 @@
-@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300);
-
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {
     border: 0;
     font-family: inherit;
@@ -20,7 +18,8 @@ html {
 }
 
 body {
-    background: #fefefe;
+    background: #fff;
+    background-image: url(images/pw_maze_white.png);
 }
 
 article, aside, details, figcaption, figure, footer, header, hgroup, nav, section {
@@ -71,7 +70,6 @@ body, button, input, select, textarea {
 
 h1, h2, h3, h4, h5, h6 {
     clear: both;
-    font-family: 'Source Sans Pro', sans-serif;
 }
 
 hr {
@@ -350,6 +348,9 @@ img.aligncenter {
 }
 
 .main-navigation {
+    clear: both;
+    display: block;
+    float: left;
     width: 100%;
 }
 
@@ -360,6 +361,7 @@ img.aligncenter {
     }
 
     .main-navigation li {
+        float: left;
         position: relative;
     }
 
@@ -674,7 +676,7 @@ ul.children .comment-author {
 }
 
 body {
-    font: 18px 'Source Sans Pro', sans-serif;
+    font: 15px "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-weight: 300;
     line-height: 1.6;
     color: #222;
@@ -685,20 +687,10 @@ body {
     text-decoration: none;
 }
 
-    .site-title a:hover {
-        color: #888;
-    }
-
 .site-title {
     line-height: 1.2;
-    font-size: 38px;
-    font-weight: 200;
+    font-size: 18px;
     margin: 10px 0 0 0;
-}
-
-.site-title small {
-    font-size: 0.5em;
-    font-style: italic;
 }
 
 .site-description {
@@ -712,38 +704,19 @@ body {
     list-style: none;
     padding: 0;
     margin: 0;
-    text-align: center;
 }
 
 .main-navigation li, #secondary li {
-    display: inline;
+    display: block;
+    width: 100%;
     margin: 0;
     padding: 0;
 }
 
-#secondary li {
-    display: block;
-    text-align: left;
-}
-
 .main-navigation a, #secondary ul li a {
-    padding: 5px 10px;
+    padding: 2px 0;
     text-decoration: none;
     display: inline;
-    color: #222;
-}
-
-        .main-navigation .home {
-            color: #888;
-        }
-
-            .main-navigation .home:hover {
-                background: none;
-                color: #444;
-            }
-
-.main-navigation a:hover {
-    background: rgba(0,0,0,.05);
 }
 
 #secondary .widget-title {
@@ -827,17 +800,16 @@ h4, h5, h6 {
     }
 
 #page {
-    max-width: 950px;
+    width: 1150px;
     margin: 0 auto;
 }
 
 #masthead {
-    width: auto;
-    margin-top: 0;
-    float: none;
+    float: left;
+    width: 21%;
+    margin-top: 15px;
     margin-bottom: 0;
-    padding: 15px;
-    text-align: center;
+    padding: 1%;
 }
 
   #masthead h2 {
@@ -846,12 +818,9 @@ h4, h5, h6 {
     margin: 10px 0;    
   }
 
-.head-inner h1 {
-    font-weight: normal;
-}
-
-.site-content {
-    padding: 0 5px;
+.site-content, #colophon {
+    float: right;
+    width: 75%;
 }
 
 #content {
@@ -861,7 +830,7 @@ h4, h5, h6 {
     clear: left;
     float: left;
     overflow: hidden;
-    width: 22%;
+    width: 21%;
     padding: 1%;
 }
 
@@ -875,8 +844,8 @@ h4, h5, h6 {
 
 .site-footer {
     clear: both;
-    padding: 40px 0;
-    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
 }
 
     .site-footer, .site-footer a {
@@ -992,6 +961,7 @@ th {
         .main-navigation li {
             display: inline-block;
             width: auto;
+            padding: 5px 20px 5px 0;
             float: none;
         }
 
@@ -1151,96 +1121,25 @@ ul.posts {
     padding:0;
 }
 
-    .post {
-        padding: 0 5px;
-    }
-
-  .post > h1 {
-    text-align: center;
-    font-weight: 300;
+  ul.posts > li > h1 {
+    margin-top: 0;
   }
-    .post > h1,
-    .post > h1 a {
+    ul.posts > li > h1 a {
+      margin-top: 0;
       text-decoration: none;
-      color: #222;
-      line-height: 1.25;
-    }
-
-    .post > h1 a:hover {
-        color: #888;
     }
    
-    .post > h1 span {
+    ul.posts > li > h1 span {
       font-size: 8pt;
       font-weight: normal;
       display: block;
+      border-top: 1px #ccc solid;
       padding-top: 5px;
       color: #999;
     }
-
-    .post .meta {
-        margin: 10px 0;
-        text-align: center;
-    }
-
-    .post .meta .posted {
-        width: 150px;
-        padding: 10px 0 5px;
-        margin: 0 auto;
-        border-top: 1px solid #ddd;
-        text-transform: uppercase;
-    }
-
-    .post .meta .categories {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-
-        .post .meta .categories li {
-            display: inline;
-            border-left: 1px solid #ddd;
-        }
-
-        .post .meta .categories li:first-child {
-            border-left: none;
-        }
-
-        .post .meta .categories li a {
-            color: #222;
-            text-decoration: none;
-            padding: 2px 5px;
-        }
-
-            .post .meta .categories li a:hover {
-                background: rgba(0,0,0,.05);
-            }
-
-.archives h2 {
-    font-weight: normal;
-}
-
-.category-list,
-.archive {
-    list-style: none;
-} 
-
-.category-list li,
-.archive li {
-    color: #222;
-}   
-
-.category-list a:hover,
-.archive a:hover {
-    background: rgba(0,0,0,.05);
-}
-
-.category-list li a,
-.archive li a {
+    
+ul.archive li {
   margin-left: 15px;
-  padding: 2px 5px;
-  text-decoration: none;
-  color: #222;
 }
 
 span.note {
@@ -1263,6 +1162,10 @@ div.post-note {
 div.divider {
   border-top: 1px #d4d4d4 solid;
   margin: 40px 0 15px 0;
+}
+
+.category-list li {
+  margin-left: 15px;
 }
 
 .fancy-container {
@@ -1344,21 +1247,6 @@ kbd {
   margin-bottom: 5px;
 }
 
-.snow-series {
-  margin: 0 0 1.5em 3em;
-  list-style: none;
-}
-
-.snow-series li {
-    color: #222;
-}
-
-.snow-series a {
-    color: #888;
-    text-decoration: none;
-}
-
-.snow-series a:hover {
-    color: #222;
-    text-decoration: underline;
+ul.snow-series {
+  margin: 0 0 1.5em 3em
 }

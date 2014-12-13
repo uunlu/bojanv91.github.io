@@ -13,7 +13,9 @@ title: Database Development Guide for .NET dev teams with Fluent Migrator
 - Simple and automated migration strategy (local and in production)
 - New developers on project should not sweat while making the database work on their machines, neither the CI server   
 
-Links to [Fluent Migrator](https://github.com/schambers/fluentmigrator/wiki)) and [example project used in this guide](https://github.com/bojanv91/DatabaseMigrationsExample).
+Links to [Fluent Migrator](https://github.com/schambers/fluentmigrator/wiki) and [example project used in this guide](https://github.com/bojanv91/DatabaseMigrationsExample).
+
+In the end - all you just need to do is run MSBuildMigrator.Migrate.bat file and watch your database being deployed.
 
 # Step by step guide into creation of the development strategy (you will need approx 15 min)
 

@@ -10,7 +10,9 @@
 &lt;li&gt;New developers on project should not sweat while making the database work on their machines, neither the CI server   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Links to &lt;a href="https://github.com/schambers/fluentmigrator/wiki"&gt;Fluent Migrator&lt;/a&gt;) and &lt;a href="https://github.com/bojanv91/DatabaseMigrationsExample"&gt;example project used in this guide&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Links to &lt;a href="https://github.com/schambers/fluentmigrator/wiki"&gt;Fluent Migrator&lt;/a&gt; and &lt;a href="https://github.com/bojanv91/DatabaseMigrationsExample"&gt;example project used in this guide&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;In the end - all you just need to do is run MSBuildMigrator.Migrate.bat file and watch your database being deployed.&lt;/p&gt;
 
 &lt;h1&gt;Step by step guide into creation of the development strategy (you will need approx 15 min)&lt;/h1&gt;
 
@@ -204,7 +206,9 @@ public class M201411131100_Product_added_column_for_storing_image_url : Migratio
 &lt;li&gt;New developers on project should not sweat while making the database work on their machines, neither the CI server   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Links to &lt;a href="https://github.com/schambers/fluentmigrator/wiki"&gt;Fluent Migrator&lt;/a&gt;) and &lt;a href="https://github.com/bojanv91/DatabaseMigrationsExample"&gt;example project used in this guide&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Links to &lt;a href="https://github.com/schambers/fluentmigrator/wiki"&gt;Fluent Migrator&lt;/a&gt; and &lt;a href="https://github.com/bojanv91/DatabaseMigrationsExample"&gt;example project used in this guide&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;In the end - all you just need to do is run MSBuildMigrator.Migrate.bat file and watch your database being deployed.&lt;/p&gt;
 
 &lt;h1&gt;Step by step guide into creation of the development strategy (you will need approx 15 min)&lt;/h1&gt;
 

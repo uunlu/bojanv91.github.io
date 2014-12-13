@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <meta http-equiv="last-modified" content="2014-12-13T23:15:22.4343511+01:00" />
+    <meta http-equiv="last-modified" content="2014-12-13T23:21:05.2628648+01:00" />
     <meta name="keywords" content="" />
     <title>Bojan's Blog</title>
     <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
@@ -63,15 +63,15 @@
 
 <h2>1. Open Visual Studio and create New Class Library Project</h2>
 
-<p><img src="images/2014-12-12-database-development-guidance/img01.png" alt="" /> </p>
+<p><img src="/images/2014-12-12-database-development-guidance/img01.png" alt="" /> </p>
 
 <h2>2. Install-Package FluentMigrator</h2>
 
-<p><img src="images/2014-12-12-database-development-guidance/img02.png" alt="" /></p>
+<p><img src="/images/2014-12-12-database-development-guidance/img02.png" alt="" /></p>
 
 <h2>3. Create new folder "Migrations" to project - here we are going to store migration files</h2>
 
-<p><img src="images/2014-12-12-database-development-guidance/img03.png" alt="" /></p>
+<p><img src="/images/2014-12-12-database-development-guidance/img03.png" alt="" /></p>
 
 <h2>4. Now, let's create database tables with migration files</h2>
 
@@ -122,13 +122,13 @@ public class M201411131100_Product_added_column_for_storing_image_url : Migratio
 
 <p>Now this is how everything looks in my solution.</p>
 
-<p><img src="images/2014-12-12-database-development-guidance/img04.png" alt="" /></p>
+<p><img src="/images/2014-12-12-database-development-guidance/img04.png" alt="" /></p>
 
 <p>Next, let's initialize the database with our script. </p>
 
 <h2>5. Creating Migration Runner (MSBuild), Migrator (.BAT) and ConnectionStrings (.CONFIG)</h2>
 
-<p><img src="images/2014-12-12-database-development-guidance/img05.png" alt="" /></p>
+<p><img src="/images/2014-12-12-database-development-guidance/img05.png" alt="" /></p>
 
 <h3>1. MSBuildMigrationRunner.proj</h3>
 
@@ -198,19 +198,19 @@ public class M201411131100_Product_added_column_for_storing_image_url : Migratio
 
 <h2>5. Run your MSBuildMigrator.Migrate.bat file</h2>
 
-<p><img src="images/2014-12-12-database-development-guidance/img06.png" alt="" /></p>
+<p><img src="/images/2014-12-12-database-development-guidance/img06.png" alt="" /></p>
 
 <p>Table VersionInfo is used for storing migration metadata.</p>
 
-<p><img src="images/2014-12-12-database-development-guidance/img07.png" alt="" /></p>
+<p><img src="/images/2014-12-12-database-development-guidance/img07.png" alt="" /></p>
 
 <p>All of our tables are created.</p>
 
-<p><img src="images/2014-12-12-database-development-guidance/img08.png" alt="" /></p>
+<p><img src="/images/2014-12-12-database-development-guidance/img08.png" alt="" /></p>
 
 <p>In VersionInfo table you can see the "commits".</p>
 
-<p><img src="images/2014-12-12-database-development-guidance/img09.png" alt="" /></p>
+<p><img src="/images/2014-12-12-database-development-guidance/img09.png" alt="" /></p>
 
 <h1>Rules of Thumb</h1>
 

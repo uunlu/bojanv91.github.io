@@ -19,15 +19,15 @@ Links to [Fluent Migrator](https://github.com/schambers/fluentmigrator/wiki)) an
 
 ## 1. Open Visual Studio and create New Class Library Project
 
-![](images/2014-12-12-database-development-guidance/img01.png) 
+![](/images/2014-12-12-database-development-guidance/img01.png) 
 
 ## 2. Install-Package FluentMigrator
 
-![](images/2014-12-12-database-development-guidance/img02.png)
+![](/images/2014-12-12-database-development-guidance/img02.png)
 
 ## 3. Create new folder "Migrations" to project - here we are going to store migration files
 
-![](images/2014-12-12-database-development-guidance/img03.png)
+![](/images/2014-12-12-database-development-guidance/img03.png)
  
 ## 4. Now, let's create database tables with migration files
 
@@ -76,13 +76,13 @@ Just for providing more examples I have added one more migration file for adding
 
 Now this is how everything looks in my solution.
 
-![](images/2014-12-12-database-development-guidance/img04.png)
+![](/images/2014-12-12-database-development-guidance/img04.png)
 
 Next, let's initialize the database with our script. 
 
 ## 5. Creating Migration Runner (MSBuild), Migrator (.BAT) and ConnectionStrings (.CONFIG)
 
-![](images/2014-12-12-database-development-guidance/img05.png)
+![](/images/2014-12-12-database-development-guidance/img05.png)
 
 ### 1. MSBuildMigrationRunner.proj
 
@@ -151,19 +151,19 @@ Viola, this is all you need to do. For your project you will need to put the con
 
 ## 5. Run your MSBuildMigrator.Migrate.bat file
 
-![](images/2014-12-12-database-development-guidance/img06.png)
+![](/images/2014-12-12-database-development-guidance/img06.png)
 
 Table VersionInfo is used for storing migration metadata.
 
-![](images/2014-12-12-database-development-guidance/img07.png)
+![](/images/2014-12-12-database-development-guidance/img07.png)
 
 All of our tables are created.
 
-![](images/2014-12-12-database-development-guidance/img08.png)
+![](/images/2014-12-12-database-development-guidance/img08.png)
 
 In VersionInfo table you can see the "commits".
 
-![](images/2014-12-12-database-development-guidance/img09.png)
+![](/images/2014-12-12-database-development-guidance/img09.png)
 
 # Rules of Thumb
 

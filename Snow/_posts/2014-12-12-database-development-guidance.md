@@ -146,6 +146,14 @@ Next, let's initialize the database with our script.
 		C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe MSBuildMigrationRunner.proj /t:Migrate /p:DatabaseProvider=SqlServer2012 /p:ConnectionStringConfigPath=ConnectionStrings.config /p:ConnectionStringName=Default /p:DataMigrationProjectName=DatabaseMigrationsExample /p:DataMigrationProjectRootPath=. /p:MigratorTasksDirectory=..\packages\FluentMigrator.1.3.1.0\tools\
 		pause
 
+- /t:Migrate - performs Migration
+- /t:MigratePreview - performs previewing of what would happen when migration is called
+- /p:DatabaseProvider=? - specify your database providers name (SqlServer2012, postgres, mysql, oracle, sqlite and other can be found in FluentMigrator documentation)
+- /p:ConnectionStringConfigPath=? - path to connection strings file
+- /p:ConnectionStringName=? - name of the connection string to use from the configuration file
+- /p:DataMigrationProjectName=? - Visual Studio project name where your migration files reside
+- /p:DataMigrationProjectRootPath=? - path to where your Visual Studio migration project resides
+- /p:MigratorTasksDirectory=? - path to FluentMigrator tools folder 
 
 Viola, this is all you need to do. For your project you will need to put the connection string to your database and make changes where needed in the .BAT file, such as database provider and project name as an essential changes. Other config stuff should be pretty common, but if you have different structure than mine, you have full power and control with the flexibility provided here.
 

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <meta http-equiv="last-modified" content="2014-12-13T23:25:30.6008995+01:00" />
+    <meta http-equiv="last-modified" content="2014-12-13T23:52:54.3875069+01:00" />
     <meta name="keywords" content="" />
     <title>Bojan's Blog</title>
     <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
@@ -204,6 +204,17 @@ public class M201411131100_Product_added_column_for_storing_image_url : Migratio
 <pre><code>    C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe MSBuildMigrationRunner.proj /t:Migrate /p:DatabaseProvider=SqlServer2012 /p:ConnectionStringConfigPath=ConnectionStrings.config /p:ConnectionStringName=Default /p:DataMigrationProjectName=DatabaseMigrationsExample /p:DataMigrationProjectRootPath=. /p:MigratorTasksDirectory=..\packages\FluentMigrator.1.3.1.0\tools\
     pause
 </code></pre>
+
+<ul>
+<li>/t:Migrate - performs Migration</li>
+<li>/t:MigratePreview - performs previewing of what would happen when migration is called</li>
+<li>/p:DatabaseProvider=? - specify your database providers name (SqlServer2012, postgres, mysql, oracle, sqlite and other can be found in FluentMigrator documentation)</li>
+<li>/p:ConnectionStringConfigPath=? - path to connection strings file</li>
+<li>/p:ConnectionStringName=? - name of the connection string to use from the configuration file</li>
+<li>/p:DataMigrationProjectName=? - Visual Studio project name where your migration files reside</li>
+<li>/p:DataMigrationProjectRootPath=? - path to where your Visual Studio migration project resides</li>
+<li>/p:MigratorTasksDirectory=? - path to FluentMigrator tools folder </li>
+</ul>
 
 <p>Viola, this is all you need to do. For your project you will need to put the connection string to your database and make changes where needed in the .BAT file, such as database provider and project name as an essential changes. Other config stuff should be pretty common, but if you have different structure than mine, you have full power and control with the flexibility provided here.</p>
 

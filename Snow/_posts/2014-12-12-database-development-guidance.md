@@ -3,7 +3,9 @@ layout: post
 title: Database Development Guide for .NET dev teams with Fluent Migrator
 ---
 
-# What is the _Intent_?
+I have been thinking a lot lately about how properly and simply to implement database versioning strategy. These years I've experienced working with different types of database setup and furthermore researched and analyzed some more approaches and tools regarding this topic. In this posting I write about my findings and why I like Fluent Migrator as a help tool in order to get the job done. But first, let's talk about the _goals_ we try to achieve. <!--excerpt-->
+
+# Goals
 
 - Auditing schema changes
 - Auditing test data changes
@@ -13,11 +15,11 @@ title: Database Development Guide for .NET dev teams with Fluent Migrator
 - Simple and automated migration strategy (local and in production)
 - New developers on project should not sweat while making the database work on their machines, neither the CI server   
 
-Links to [Fluent Migrator](https://github.com/schambers/fluentmigrator/wiki) and [example project used in this guide](https://github.com/bojanv91/DatabaseMigrationsExample).
+Links to [Fluent Migrator](https://github.com/schambers/fluentmigrator/wiki) and [this guide's project](https://github.com/bojanv91/DatabaseMigrationsExample).
 
-In the end - all you just need to do is run MSBuildMigrator.Migrate.bat file and watch your database being deployed.
+In the end - all you just need to do is run MSBuildMigrator.Migrate.bat file and watch your database being deployed, upgraded, downgraded...it will figure out ;) .
 
-# Step by step guide into creation of the development strategy (you will need approx 15 min)
+# Step by step guide
 
 ## 1. Open Visual Studio and create New Class Library Project
 

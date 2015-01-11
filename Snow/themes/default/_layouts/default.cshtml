@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="last-modified" content="@Model.GeneratedDate" />
     <meta name="keywords" content="@keywords" />
-    <title>Bojan's Blog</title>
+    <title>@RenderSection("PageTitlePrefix", false) Bojan Veljanovski's Blog</title>
     <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
     @Html.CanonicalUrl()
 </head>

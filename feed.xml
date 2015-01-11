@@ -1,4 +1,271 @@
-<feed xmlns="http://www.w3.org/2005/Atom"><title type="text">Bojan Veljanovski's notes and thoughts on software</title><subtitle type="text">Bojan Veljanovski's notes and thoughts on software</subtitle><id>http://bojanv91.github.io/</id><updated>2014-12-21T17:48:32+01:00</updated><author><name>Bojan Veljanovski</name><uri>http://bojanv91.github.io</uri><email>bojanv91@live.com</email></author><generator>Sandra.Snow Atom Generator</generator><link rel="alternate" href="http://bojanv91.github.io/feed.xml" /><link rel="self" type="text/html" title="Bojan Veljanovski's notes and thoughts on software" href="http://bojanv91.github.io/feed.xml" /><entry><id>http://bojanv91.github.io/2014/12/database-development-guidance/</id><title type="text">Database Development Guide for .NET dev teams with Fluent Migrator</title><summary type="html">&lt;h1&gt;Intent&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title type="text">Bojan Veljanovski's notes and thoughts on software</title><subtitle type="text">Bojan Veljanovski's notes and thoughts on software</subtitle><id>http://bojanv91.github.io/</id><updated>2015-01-11T20:17:52+01:00</updated><author><name>Bojan Veljanovski</name><uri>http://bojanv91.github.io</uri><email>bojanv91@live.com</email></author><generator>Sandra.Snow Atom Generator</generator><link rel="alternate" href="http://bojanv91.github.io/feed.xml" /><link rel="self" type="text/html" title="Bojan Veljanovski's notes and thoughts on software" href="http://bojanv91.github.io/feed.xml" /><entry><id>http://bojanv91.github.io/2015/01/getting-started-with-rhino-security-structuremap/</id><title type="text">Getting Started with Rhino Security and Structure Map</title><summary type="html">&lt;p&gt;In this posting I will show you how to configure Rhino Security infrastructure to work with StructureMap IoC container and provide to you database schema (for MSSQL and &lt;a href="http://bojanv91.github.io/2014/12/database-development-guidance/"&gt;FluentMigrator&lt;/a&gt;) that you will need in order Rhino Security to get working. I've struggled some time before I got everything working, so here are my results. :) </summary><published>2015-01-10T23:00:00Z</published><updated>2015-01-10T23:00:00Z</updated><link rel="alternate" href="http://bojanv91.github.io/2015/01/getting-started-with-rhino-security-structuremap/" /><content type="html">&lt;p&gt;In this posting I will show you how to configure Rhino Security infrastructure to work with StructureMap IoC container and provide to you database schema (for MSSQL and &lt;a href="http://bojanv91.github.io/2014/12/database-development-guidance/"&gt;FluentMigrator&lt;/a&gt;) that you will need in order Rhino Security to get working. I've struggled some time before I got everything working, so here are my results. :) &lt;!--excerpt--&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;a href="https://github.com/ayende/rhino-security"&gt;Rhino Security&lt;/a&gt; is a security framework to provide row level security for NHibernate. Rhino Security is perfect for people who want to set up user and group security in their NHibernate domain models. &lt;/p&gt;
+  
+  &lt;blockquote&gt;
+    &lt;p&gt;&lt;a href="https://github.com/ayende/rhino-security"&gt;Rhino Security GitHub repository&lt;/a&gt;  &lt;/p&gt;
+  &lt;/blockquote&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;More details about the architecture and how Rhino Security works behind the scenes can be found &lt;a href="http://ayende.com/blog/2958/a-vision-of-enterprise-platform-security-infrastructure"&gt;here&lt;/a&gt;, &lt;a href="http://ayende.com/blog/3109/rhino-security-overview-part-i"&gt;here&lt;/a&gt; and &lt;a href="http://ayende.com/blog/3113/rhino-security-part-ii-discussing-the-implementation"&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h1&gt;Action Plan&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Installing NuGet packages&lt;/li&gt;
+&lt;li&gt;Configuring StructureMap container and registering Rhino.Security into NHibernate &lt;/li&gt;
+&lt;li&gt;Implementing CommonServiceLocator provider for StructureMap&lt;/li&gt;
+&lt;li&gt;User entity that implements Rhino.Security.IUser interface&lt;/li&gt;
+&lt;li&gt;Preparing the database schema&lt;/li&gt;
+&lt;li&gt;Usage DEMO (code samples &lt;a href="https://github.com/bojanv91/RhinoSecurityWithStructureMap"&gt;https://github.com/bojanv91/RhinoSecurityWithStructureMap&lt;/a&gt;) &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2015-01-11-getting-started-with-rhino-security-structuremap/rhino-01.png" alt="Getting started with Rhino Security and StructureMap" /&gt;&lt;/p&gt;
+
+&lt;h2&gt;Installing NuGet packages&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;Install-Package Rhino.Security          
+Install-Package NHibernate
+Install-Package FluentNHibernate
+Install-Package StructureMap
+Install-Package CommonServiceLocator
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;FluentNHibernate provides fluent mapping interface for mapping our domain model entities to table structures via NHibernate.&lt;br /&gt;
+CommonServiceLocator provides abstraction over IoC containers and service locators and contains a shared interface for service location. Rhino Security makes use of it, that is why can be used with any IoC container. &lt;/p&gt;
+
+&lt;h2&gt;Configuring StructureMap container and registering Rhino.Security into NHibernate&lt;/h2&gt;
+
+&lt;p&gt;In the following code snippet I have all configuration stuff in one class, called the Bootstrapper. It's purpose is to provide functionality for booting up our application, the starting point. Explanations about what does what are put in comments. If something is still unclear do write me a comment, I'll happily update that part. &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;using FluentNHibernate.Cfg;
+using FluentNHibernate.Cfg.Db;
+using NHibernate;
+using NHibernate.Cfg;
+using NHibernate.Context;
+using Rhino.Security.Interfaces;
+using Rhino.Security.Services;
+
+namespace RhinoSecurityWithStructureMap
+{
+    public class Bootstrapper
+    {
+        public static void Bootstrap(string connectionString)
+        {
+            var container = new StructureMap.Container();
+            container.Configure(cfg =&amp;gt;
+                {
+                    //NHibernate configurations 
+                    cfg.For&amp;lt;ISessionFactory&amp;gt;().Singleton().Use(() =&amp;gt; CreateSessionFactory(connectionString));
+                    cfg.For&amp;lt;ISession&amp;gt;().Use(context =&amp;gt; GetSession(context));
+
+                    //Rhino Security configurations 
+                    cfg.For&amp;lt;IAuthorizationService&amp;gt;().Use&amp;lt;AuthorizationService&amp;gt;();
+                    cfg.For&amp;lt;IAuthorizationRepository&amp;gt;().Use&amp;lt;AuthorizationRepository&amp;gt;();
+                    cfg.For&amp;lt;IPermissionsBuilderService&amp;gt;().Use&amp;lt;PermissionsBuilderService&amp;gt;();
+                    cfg.For&amp;lt;IPermissionsService&amp;gt;().Use&amp;lt;PermissionsService&amp;gt;();
+                });
+
+            //Setting up StuctureMapServiceLocator as a CommonServiceLocator that Rhino.Security will use for DI
+            Microsoft.Practices.ServiceLocation.ServiceLocator
+                .SetLocatorProvider(() =&amp;gt; new StructureMapServiceLocator(container));
+        }
+
+        private static ISessionFactory CreateSessionFactory(string connectionString)
+        {
+            FluentConfiguration fluentConfig = Fluently.Configure()
+                .Database(MsSqlConfiguration.MsSql2012.ConnectionString(connectionString))          //specifying connection string for Microsoft SQL Server 2012 
+                .Mappings(m =&amp;gt; m.FluentMappings.AddFromAssemblyOf&amp;lt;Bootstrapper&amp;gt;())                  //specifying in which assembly NHibernate should look for entity mappings
+                .CurrentSessionContext(typeof(ThreadStaticSessionContext).AssemblyQualifiedName)    //specifying the session context lifecycle to be initialized per thread
+                .ExposeConfiguration(cfg =&amp;gt;
+                {
+                    Rhino.Security.Security.Configure&amp;lt;User&amp;gt;(cfg, Rhino.Security.SecurityTableStructure.Prefix);
+                });
+
+            return fluentConfig.BuildSessionFactory();
+        }
+
+        private static ISession GetSession(StructureMap.IContext context)
+        {
+            var sessionFactory = context.GetInstance&amp;lt;ISessionFactory&amp;gt;();
+            return sessionFactory.GetCurrentSession();
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2&gt;Implementing CommonServiceLocator provider for StructureMap&lt;/h2&gt;
+
+&lt;p&gt;The code is pretty much straightforward. We just implement Microsoft.Practices.ServiceLocation.IServiceLocator interface with the common code that is provided to us by StructureMap IContainer interface, basically this class acts as a wrapper.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public class StructureMapServiceLocator : Microsoft.Practices.ServiceLocation.IServiceLocator
+{
+    private readonly IContainer _container;
+
+    public StructureMapServiceLocator(IContainer container)
+    {
+        _container = container;
+    }
+
+    public IEnumerable&amp;lt;TService&amp;gt; GetAllInstances&amp;lt;TService&amp;gt;()
+    {
+        return _container.GetAllInstances&amp;lt;TService&amp;gt;();
+    }
+
+    public IEnumerable&amp;lt;object&amp;gt; GetAllInstances(Type serviceType)
+    {
+        return (IEnumerable&amp;lt;object&amp;gt;)_container.GetAllInstances(serviceType);
+    }
+
+    public TService GetInstance&amp;lt;TService&amp;gt;(string key)
+    {
+        return _container.GetInstance&amp;lt;TService&amp;gt;(key);
+    }
+
+    public TService GetInstance&amp;lt;TService&amp;gt;()
+    {
+        return _container.GetInstance&amp;lt;TService&amp;gt;();
+    }
+
+    public object GetInstance(Type serviceType, string key)
+    {
+        return _container.GetInstance(serviceType, key);
+    }
+
+    public object GetInstance(Type serviceType)
+    {
+        return _container.GetInstance(serviceType);
+    }
+
+    public object GetService(Type serviceType)
+    {
+        return _container.GetInstance(serviceType);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2&gt;User entity implements Rhino.Security.IUser interface&lt;/h2&gt;
+
+&lt;p&gt;In our domain model we commonly have entity which represents the actual user. Rhino.Security must know which entity is the user entity in order to work. So our User entity must implement Rhino.Security.IUser interface, more precisely only SecurityInfo property from the interface must be implemented.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public class User : Rhino.Security.IUser
+{
+    public virtual int Id { get; protected set; }       
+    public virtual string Username { get; set; }
+    public virtual string PasswordHashed { get; set; }
+
+    public Rhino.Security.SecurityInfo SecurityInfo
+    {
+        get
+        {
+            return new Rhino.Security.SecurityInfo(Username, Id);
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2&gt;Preparing the database schema&lt;/h2&gt;
+
+&lt;p&gt;Schema files can be found in the following links:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/bojanv91/RhinoSecurityWithStructureMap/blob/master/RhinoSecurityWithStructureMap/DatabaseScripts/rhino_security_and_basic_user.sql.sql"&gt;SQL dump&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/bojanv91/RhinoSecurityWithStructureMap/blob/master/RhinoSecurityWithStructureMap/DatabaseScripts/rhino_security_and_basic_user.cs"&gt;Fluent Migrator schema&lt;/a&gt; (&lt;a href="http://bojanv91.github.io/2014/12/database-development-guidance/"&gt;blogpost about how to use Fluent Migrator&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2015-01-11-getting-started-with-rhino-security-structuremap/rhino-02.png" alt="Rhino database schema" /&gt;&lt;/p&gt;
+
+&lt;h2&gt;Usage DEMO&lt;/h2&gt;
+
+&lt;p&gt;The full code sample can be found in following github repository: &lt;a href="https://github.com/bojanv91/RhinoSecurityWithStructureMap"&gt;https://github.com/bojanv91/RhinoSecurityWithStructureMap&lt;/a&gt;. Here I provide excerpt code snippets from the actual test code.&lt;/p&gt;
+
+&lt;p&gt;Setting up user groups, operations and permissions:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var _authorizationRepository = ServiceLocator.Current.GetInstance&amp;lt;IAuthorizationRepository&amp;gt;();
+var _authorizationService = ServiceLocator.Current.GetInstance&amp;lt;IAuthorizationService&amp;gt;();
+var _permissionsBuilderService = ServiceLocator.Current.GetInstance&amp;lt;IPermissionsBuilderService&amp;gt;();
+var _permissionService = ServiceLocator.Current.GetInstance&amp;lt;IPermissionsService&amp;gt;();
+
+using (var transaction = _session.BeginTransaction())
+{
+    //creating user group 'Admin'
+    _authorizationRepository.CreateUsersGroup("Admin");
+
+    //creating operations
+    _authorizationRepository.CreateOperation("/Content");
+    _authorizationRepository.CreateOperation("/Content/Create");
+    _authorizationRepository.CreateOperation("/Content/View");
+    _authorizationRepository.CreateOperation("/Content/Delete");
+
+    transaction.Commit();
+}
+
+using (var transaction = _session.BeginTransaction())
+{
+    //adding the LoggedInUser to the 'Admin' users group
+    _authorizationRepository.AssociateUserWith(_loggedInUser, "Admin");
+
+    //Building 'Allow' permissions for the LoggedInUser, 
+    //by default if not defined as allowed, the operation is denied
+    //For the sake of this example, we say the the users that are in 'Admin' users group can
+    //create and view content, but cannot delete content. 
+    _permissionsBuilderService.Allow("/Content/Create").For("Admin").OnEverything().DefaultLevel().Save();
+    _permissionsBuilderService.Allow("/Content/View").For("Admin").OnEverything().DefaultLevel().Save();
+
+    //We can explicitly define 'Deny' permission, but as the default behaviour denies everything 
+    //that is not defined as 'Allow', I am not going to define it. You don't trust me? 
+    //That's why we have tests ;) 
+    //_permissionsBuilderService.Deny("/Content/Delete").For("Admin").OnEverything().DefaultLevel().Save();
+
+    transaction.Commit();
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Test code demonstrating the usage:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public class RhinoTests : IUseFixture&amp;lt;TestFixture&amp;gt;
+{
+    private readonly IAuthorizationService _authorizationService;
+    private readonly User _loggedInUser;
+
+    public RhinoTests() 
+    {
+        _authorizationService = ServiceLocator.Current.GetInstance&amp;lt;IAuthorizationService&amp;gt;();
+        _loggedInUser = TestFixture._loggedInUser;
+    }
+
+    [Fact]
+    public void it_should_allow_content_creation()
+    {
+        bool result = _authorizationService.IsAllowed(_loggedInUser, "/Content/Create");
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void it_should_allow_content_viewing()
+    {
+        bool result = _authorizationService.IsAllowed(_loggedInUser, "/Content/View");
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void it_should_deny_content_deletition()
+    {
+        bool result = _authorizationService.IsAllowed(_loggedInUser, "/Content/Delete");
+        Assert.False(result);
+    }
+
+    public void SetFixture(TestFixture data) { }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Happy coding folks! Having questions or concerns? Shoot me a tweet -&gt; @bojanv91&lt;/p&gt;
+</content></entry><entry><id>http://bojanv91.github.io/2014/12/database-development-guidance/</id><title type="text">Database Development Guide for .NET dev teams with Fluent Migrator</title><summary type="html">&lt;p&gt;I have been thinking a lot lately about how properly and simply to implement database versioning strategy. These years I've experienced working with different types of database setup and furthermore researched and analyzed some more approaches and tools regarding this topic. In this posting I write about my findings and why I like Fluent Migrator as a help tool in order to get the job done. But first, let's talk about the &lt;em&gt;goals&lt;/em&gt; we try to achieve. </summary><published>2014-12-11T23:00:00Z</published><updated>2014-12-11T23:00:00Z</updated><link rel="alternate" href="http://bojanv91.github.io/2014/12/database-development-guidance/" /><content type="html">&lt;p&gt;I have been thinking a lot lately about how properly and simply to implement database versioning strategy. These years I've experienced working with different types of database setup and furthermore researched and analyzed some more approaches and tools regarding this topic. In this posting I write about my findings and why I like Fluent Migrator as a help tool in order to get the job done. But first, let's talk about the &lt;em&gt;goals&lt;/em&gt; we try to achieve. &lt;!--excerpt--&gt;&lt;/p&gt;
+
+&lt;h1&gt;Goals&lt;/h1&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Auditing schema changes&lt;/li&gt;
@@ -10,23 +277,23 @@
 &lt;li&gt;New developers on project should not sweat while making the database work on their machines, neither the CI server   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Links to &lt;a href="https://github.com/schambers/fluentmigrator/wiki"&gt;Fluent Migrator&lt;/a&gt; and &lt;a href="https://github.com/bojanv91/DatabaseMigrationsExample"&gt;example project used in this guide&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Links to &lt;a href="https://github.com/schambers/fluentmigrator/wiki"&gt;Fluent Migrator&lt;/a&gt; and &lt;a href="https://github.com/bojanv91/DatabaseMigrationsExample"&gt;this guide's project&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;In the end - all you just need to do is run MSBuildMigrator.Migrate.bat file and watch your database being deployed.&lt;/p&gt;
+&lt;p&gt;In the end - all you just need to do is run MSBuildMigrator.Migrate.bat file and watch your database being deployed, upgraded, downgraded...it will figure out ;) .&lt;/p&gt;
 
-&lt;h1&gt;Step by step guide into creation of the development strategy (you will need approx 15 min)&lt;/h1&gt;
+&lt;h1&gt;Step by step guide&lt;/h1&gt;
 
 &lt;h2&gt;1. Open Visual Studio and create New Class Library Project&lt;/h2&gt;
 
-&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-12-12-database-development-guidance/img01.png" alt="" /&gt; &lt;/p&gt;
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-12-12-database-development-guidance/img01.png" alt="Open Visual Studio and create New Class Library Project" /&gt; &lt;/p&gt;
 
 &lt;h2&gt;2. Install-Package FluentMigrator&lt;/h2&gt;
 
-&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-12-12-database-development-guidance/img02.png" alt="" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-12-12-database-development-guidance/img02.png" alt="Install-Package FluentMigrator" /&gt;&lt;/p&gt;
 
 &lt;h2&gt;3. Create new folder "Migrations" to project - here we are going to store migration files&lt;/h2&gt;
 
-&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-12-12-database-development-guidance/img03.png" alt="" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-12-12-database-development-guidance/img03.png" alt="Create new folder &amp;quot;Migrations&amp;quot; to project - here we are going to store migration files" /&gt;&lt;/p&gt;
 
 &lt;h2&gt;4. Now, let's create database tables with migration files&lt;/h2&gt;
 
@@ -193,201 +460,5 @@ public class M201411131100_Product_added_column_for_storing_image_url : Migratio
 
 &lt;hr /&gt;
 
-&lt;p&gt;I am on twitter as @bojanv91, let me know if you have any questions or considerations. Happy codding. &lt;/p&gt;
-</summary><published>2014-12-11T23:00:00Z</published><updated>2014-12-11T23:00:00Z</updated><link rel="alternate" href="http://bojanv91.github.io/2014/12/database-development-guidance/" /><content type="html">&lt;h1&gt;Intent&lt;/h1&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Auditing schema changes&lt;/li&gt;
-&lt;li&gt;Auditing test data changes&lt;/li&gt;
-&lt;li&gt;Keeping schema and test data integrity across machines&lt;/li&gt;
-&lt;li&gt;Versioning via source version control systems&lt;/li&gt;
-&lt;li&gt;DB-provider agnostic migration (MSSQL, PostgreSql, MySql, Oracle)&lt;/li&gt;
-&lt;li&gt;Simple and automated migration strategy (local and in production)&lt;/li&gt;
-&lt;li&gt;New developers on project should not sweat while making the database work on their machines, neither the CI server   &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Links to &lt;a href="https://github.com/schambers/fluentmigrator/wiki"&gt;Fluent Migrator&lt;/a&gt; and &lt;a href="https://github.com/bojanv91/DatabaseMigrationsExample"&gt;example project used in this guide&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;In the end - all you just need to do is run MSBuildMigrator.Migrate.bat file and watch your database being deployed.&lt;/p&gt;
-
-&lt;h1&gt;Step by step guide into creation of the development strategy (you will need approx 15 min)&lt;/h1&gt;
-
-&lt;h2&gt;1. Open Visual Studio and create New Class Library Project&lt;/h2&gt;
-
-&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-12-12-database-development-guidance/img01.png" alt="" /&gt; &lt;/p&gt;
-
-&lt;h2&gt;2. Install-Package FluentMigrator&lt;/h2&gt;
-
-&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-12-12-database-development-guidance/img02.png" alt="" /&gt;&lt;/p&gt;
-
-&lt;h2&gt;3. Create new folder "Migrations" to project - here we are going to store migration files&lt;/h2&gt;
-
-&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-12-12-database-development-guidance/img03.png" alt="" /&gt;&lt;/p&gt;
-
-&lt;h2&gt;4. Now, let's create database tables with migration files&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;[FluentMigrator.Migration(0)]
-public class Baseline : FluentMigrator.Migration
-{
-    public override void Up()
-    {
-        Create.Table("Category")
-            .WithColumn("Id").AsGuid().NotNullable().PrimaryKey()
-            .WithColumn("Name").AsString(255);
-
-        Create.Table("Product")
-            .WithColumn("Id").AsGuid().NotNullable().PrimaryKey()
-            .WithColumn("CategoryId").AsGuid().ForeignKey("Category", "Id")
-            .WithColumn("Name").AsString(255)
-            .WithColumn("Price").AsDecimal();
-    }
-
-    public override void Down()
-    {
-        Delete.Table("Product");
-        Delete.Table("Category");
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;That is all what is needed. In essence a migration is a class which drives from &lt;strong&gt;Migration abstract class&lt;/strong&gt;  and implements &lt;strong&gt;'Up'&lt;/strong&gt; and &lt;strong&gt;'Down'&lt;/strong&gt; methods. Additionally you will also need to define &lt;strong&gt;Migration Attribute&lt;/strong&gt; with unique identifier in order the migration runner to know the order of migration files. I like it how FM API is designed, it really follows the SQL language and how I would write this script in plain SQL.
-Read further &lt;a href="https://github.com/schambers/fluentmigrator/wiki/Migration"&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Just for providing more examples I have added one more migration file for adding one more column to Product table for storing image URL.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[Migration(201411131100)]
-public class M201411131100_Product_added_column_for_storing_image_url : Migration
-{
-    public override void Up()
-    {
-        Alter.Table("Product")
-            .AddColumn("ImageUrl").AsString(255);
-    }
-
-    public override void Down()
-    {
-        Delete.Column("ImageUrl").FromTable("Product");
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Now this is how everything looks in my solution.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-12-12-database-development-guidance/img04.png" alt="" /&gt;&lt;/p&gt;
-
-&lt;p&gt;Next, let's initialize the database with our script. &lt;/p&gt;
-
-&lt;h2&gt;5. Creating Migration Runner (MSBuild), Migrator (.BAT) and ConnectionStrings (.CONFIG)&lt;/h2&gt;
-
-&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-12-12-database-development-guidance/img05.png" alt="" /&gt;&lt;/p&gt;
-
-&lt;h3&gt;1. MSBuildMigrationRunner.proj&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;    &amp;lt;?xml version="1.0"?&amp;gt;
-    &amp;lt;Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Migrate"&amp;gt;
-        &amp;lt;PropertyGroup&amp;gt;
-            &amp;lt;DatabaseProvider&amp;gt;&amp;lt;/DatabaseProvider&amp;gt;
-            &amp;lt;ConnectionStringConfigPath&amp;gt;&amp;lt;/ConnectionStringConfigPath&amp;gt;
-            &amp;lt;ConnectionStringName&amp;gt;&amp;lt;/ConnectionStringName&amp;gt;
-            &amp;lt;DataMigrationProjectName&amp;gt;DatabaseMigrationsExample&amp;lt;/DataMigrationProjectName&amp;gt;
-            &amp;lt;DataMigrationProjectRootPath&amp;gt;$(MSBuildProjectDirectory)&amp;lt;/DataMigrationProjectRootPath&amp;gt;
-            &amp;lt;MigratorTasksDirectory&amp;gt;&amp;lt;/MigratorTasksDirectory&amp;gt;
-
-            &amp;lt;DataMigrationProjectBuildDLL&amp;gt;$(DataMigrationProjectRootPath)\bin\Debug\$(DataMigrationProjectName).dll&amp;lt;/DataMigrationProjectBuildDLL&amp;gt;
-            &amp;lt;DataMigrationProjectCsproj&amp;gt;$(DataMigrationProjectRootPath)\$(DataMigrationProjectName).csproj&amp;lt;/DataMigrationProjectCsproj&amp;gt;
-        &amp;lt;/PropertyGroup&amp;gt;
-
-        &amp;lt;UsingTask TaskName="FluentMigrator.MSBuild.Migrate" AssemblyFile="$(MigratorTasksDirectory)FluentMigrator.MSBuild.dll"/&amp;gt;
-
-        &amp;lt;Target Name="Build"&amp;gt;
-            &amp;lt;MSBuild Projects="$(DataMigrationProjectCsproj)" Properties="Configuration=Debug"/&amp;gt;
-        &amp;lt;/Target&amp;gt;
-
-        &amp;lt;Target Name="Migrate" DependsOnTargets="Build"&amp;gt;
-            &amp;lt;Message Text="Starting FluentMigrator Migration"/&amp;gt;
-            &amp;lt;Migrate Database="$(DatabaseProvider)"
-                     Connection="$(ConnectionStringName)"
-                     ConnectionStringConfigPath="$(ConnectionStringConfigPath)"
-                     Target="$(DataMigrationProjectBuildDLL)"
-                     Output="True"
-                     Verbose="True"&amp;gt;
-            &amp;lt;/Migrate&amp;gt;
-        &amp;lt;/Target&amp;gt;
-
-        &amp;lt;Target Name="MigratePreview" DependsOnTargets="Build"&amp;gt;
-            &amp;lt;Message Text="Previewing FluentMigrator Migration"/&amp;gt;
-            &amp;lt;Migrate Database="$(DatabaseProvider)"
-                     Connection="$(ConnectionStringName)"
-                     ConnectionStringConfigPath="$(ConnectionStringConfigPath)"
-                     Target="$(DataMigrationProjectBuildDLL)"
-                     Output="True"
-                     Verbose="True"
-                     PreviewOnly="True"&amp;gt;
-            &amp;lt;/Migrate&amp;gt;
-        &amp;lt;/Target&amp;gt;
-    &amp;lt;/Project&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3&gt;2. ConnectionStrings.config&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;    &amp;lt;?xml version="1.0" encoding="utf-8" ?&amp;gt;
-    &amp;lt;configuration&amp;gt;
-        &amp;lt;connectionStrings&amp;gt;
-            &amp;lt;clear /&amp;gt;
-            &amp;lt;add name="Default" connectionString="Server=###;User ID=###;Password=###;Database=###;"/&amp;gt;
-        &amp;lt;/connectionStrings&amp;gt;
-    &amp;lt;/configuration&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3&gt;3. MSBuildMigrator.Migrate.bat&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;    C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe MSBuildMigrationRunner.proj /t:Migrate /p:DatabaseProvider=SqlServer2012 /p:ConnectionStringConfigPath=ConnectionStrings.config /p:ConnectionStringName=Default /p:DataMigrationProjectName=DatabaseMigrationsExample /p:DataMigrationProjectRootPath=. /p:MigratorTasksDirectory=..\packages\FluentMigrator.1.3.1.0\tools\
-    pause
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;ul&gt;
-&lt;li&gt;/t:Migrate - performs Migration&lt;/li&gt;
-&lt;li&gt;/t:MigratePreview - performs previewing of what would happen when migration is called&lt;/li&gt;
-&lt;li&gt;/p:DatabaseProvider=? - specify your database providers name (SqlServer2012, postgres, mysql, oracle, sqlite and other can be found in FluentMigrator documentation)&lt;/li&gt;
-&lt;li&gt;/p:ConnectionStringConfigPath=? - path to connection strings file&lt;/li&gt;
-&lt;li&gt;/p:ConnectionStringName=? - name of the connection string to use from the configuration file&lt;/li&gt;
-&lt;li&gt;/p:DataMigrationProjectName=? - Visual Studio project name where your migration files reside&lt;/li&gt;
-&lt;li&gt;/p:DataMigrationProjectRootPath=? - path to where your Visual Studio migration project resides&lt;/li&gt;
-&lt;li&gt;/p:MigratorTasksDirectory=? - path to FluentMigrator tools folder &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Viola, this is all you need to do. For your project you will need to put the connection string to your database and make changes where needed in the .BAT file, such as database provider and project name as an essential changes. Other config stuff should be pretty common, but if you have different structure than mine, you have full power and control with the flexibility provided here.&lt;/p&gt;
-
-&lt;h2&gt;5. Run your MSBuildMigrator.Migrate.bat file&lt;/h2&gt;
-
-&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-12-12-database-development-guidance/img06.png" alt="" /&gt;&lt;/p&gt;
-
-&lt;p&gt;Table VersionInfo is used for storing migration metadata.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-12-12-database-development-guidance/img07.png" alt="" /&gt;&lt;/p&gt;
-
-&lt;p&gt;All of our tables are created.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-12-12-database-development-guidance/img08.png" alt="" /&gt;&lt;/p&gt;
-
-&lt;p&gt;In VersionInfo table you can see the "commits".&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2014-12-12-database-development-guidance/img09.png" alt="" /&gt;&lt;/p&gt;
-
-&lt;h1&gt;Rules of Thumb&lt;/h1&gt;
-
-&lt;ul&gt;
-&lt;li&gt;First migration is always called "BaseLine" with migration ID: 0. Everything starts from there.&lt;/li&gt;
-&lt;li&gt;Migration unique identification number is composed of current datetime when the migration is being created in format #yyyyMMddhhmm#&lt;br /&gt;
-(example: now is 2014-11-13 10:15, so migration ID would be 201411131015)&lt;/li&gt;
-&lt;li&gt;Migration filename should explain what is being changed - just like how you would write a commit message - in format 'M#yyyyMMddhhmm#_Message.cs'&lt;br /&gt;
-(example: M201411131015_created_all_initial_tables)&lt;/li&gt;
-&lt;li&gt;Class name should follow the exact convention like the filename&lt;br /&gt;
-(example: class M201411131015_created_all_initial_tables { .. }&lt;/li&gt;
-&lt;li&gt;MSBuildMigrationRunner.proj, ConnectionStrings.config, MSBuildMigrator.Migrate.bat are stored in Migration project root folder&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;I am on twitter as @bojanv91, let me know if you have any questions or considerations. Happy codding. &lt;/p&gt;
+&lt;p&gt;Happy coding folks! Having questions or concerns? Shoot me a tweet -&gt; @bojanv91&lt;/p&gt;
 </content></entry></feed>

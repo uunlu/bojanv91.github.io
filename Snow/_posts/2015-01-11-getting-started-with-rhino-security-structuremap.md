@@ -3,7 +3,7 @@ layout: post
 title: Getting Started with Rhino Security and Structure Map
 ---
 
-In this posting I will show you how to configure Rhino Security infrastructure to work with StructureMap IoC container and provide to you database schema (for MSSQL and [FluentMigrator](http://bojanv91.github.io/2014/12/database-development-guidance/)) that you will need in order Rhino Security to get working. I've struggled some time before I got everything working :) , so I'm happy to share my results. 
+In this posting I will show you how to configure Rhino Security infrastructure to work with StructureMap IoC container and provide to you database schema (for MSSQL and [FluentMigrator](http://bojanv91.github.io/2014/12/database-development-guidance/)) that you will need in order Rhino Security to get working. I've struggled some time before I got everything working, so here are my results. :) <!--excerpt-->
 
 > [Rhino Security](https://github.com/ayende/rhino-security) is a security framework to provide row level security for NHibernate. Rhino Security is perfect for people who want to set up user and group security in their NHibernate domain models. 
 > 
@@ -20,7 +20,7 @@ More details about the architecture and how Rhino Security works behind the scen
 - Preparing the database schema
 - Usage DEMO (code samples [https://github.com/bojanv91/RhinoSecurityWithStructureMap](https://github.com/bojanv91/RhinoSecurityWithStructureMap)) 
 
-![Getting started with Rhino Security and StructureMap](\images\2015-01-11-getting-started-with-rhino-security-structuremap\rhino-01.png)
+![Getting started with Rhino Security and StructureMap](/images/2015-01-11-getting-started-with-rhino-security-structuremap/rhino-01.png)
  
 ## Installing NuGet packages
 
@@ -166,9 +166,9 @@ In our domain model we commonly have entity which represents the actual user. Rh
 Schema files can be found in the following links:
 
 - [SQL dump](https://github.com/bojanv91/RhinoSecurityWithStructureMap/blob/master/RhinoSecurityWithStructureMap/DatabaseScripts/rhino_security_and_basic_user.sql.sql)
-- [Fluent Migrator schema](https://github.com/bojanv91/RhinoSecurityWithStructureMap/blob/master/RhinoSecurityWithStructureMap/DatabaseScripts/rhino_security_and_basic_user.cs) ([blogpost about how to use Fluent Migrator](bojanv91.github.io/images/2014-12-12-database-development-guidance/))
+- [Fluent Migrator schema](https://github.com/bojanv91/RhinoSecurityWithStructureMap/blob/master/RhinoSecurityWithStructureMap/DatabaseScripts/rhino_security_and_basic_user.cs) ([blogpost about how to use Fluent Migrator](http://bojanv91.github.io/2014/12/database-development-guidance/))
 
-![Rhino database schema](\images\2015-01-11-getting-started-with-rhino-security-structuremap\rhino-02.png)
+![Rhino database schema](/images/2015-01-11-getting-started-with-rhino-security-structuremap/rhino-02.png)
 
 ## Usage DEMO
 

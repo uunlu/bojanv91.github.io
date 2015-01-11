@@ -3,7 +3,7 @@ layout: post
 title: Database Development Guide for .NET dev teams with Fluent Migrator
 ---
 
-# Intent
+# What is the _Intent_?
 
 - Auditing schema changes
 - Auditing test data changes
@@ -21,15 +21,15 @@ In the end - all you just need to do is run MSBuildMigrator.Migrate.bat file and
 
 ## 1. Open Visual Studio and create New Class Library Project
 
-![](/images/2014-12-12-database-development-guidance/img01.png) 
+![Open Visual Studio and create New Class Library Project](/images/2014-12-12-database-development-guidance/img01.png) 
 
 ## 2. Install-Package FluentMigrator
 
-![](/images/2014-12-12-database-development-guidance/img02.png)
+![Install-Package FluentMigrator](/images/2014-12-12-database-development-guidance/img02.png)
 
 ## 3. Create new folder "Migrations" to project - here we are going to store migration files
 
-![](/images/2014-12-12-database-development-guidance/img03.png)
+![Create new folder "Migrations" to project - here we are going to store migration files](/images/2014-12-12-database-development-guidance/img03.png)
  
 ## 4. Now, let's create database tables with migration files
 
@@ -188,6 +188,4 @@ In VersionInfo table you can see the "commits".
 
 ---
 
-I am on twitter as @bojanv91, let me know if you have any questions or considerations. Happy codding. 
-
-
+Happy coding folks! Having questions or concerns? Shoot me a tweet -> @bojanv91

@@ -1,4 +1,76 @@
-<rss xmlns:a10="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Bojan Veljanovski's notes and thoughts on software</title><link>http://bojanv91.github.io/rss.xml</link><description>Bojan Veljanovski's notes and thoughts on software</description><item><guid isPermaLink="true">http://bojanv91.github.io/2015/01/getting-started-with-rhino-security-structuremap/</guid><link>http://bojanv91.github.io/2015/01/getting-started-with-rhino-security-structuremap/</link><title>Getting Started with Rhino Security and Structure Map</title><description>&lt;p&gt;In this posting I will show you how to configure Rhino Security infrastructure to work with StructureMap IoC container and provide to you database schema (for MSSQL and &lt;a href="http://bojanv91.github.io/2014/12/database-development-guidance/"&gt;FluentMigrator&lt;/a&gt;) that you will need in order Rhino Security to get working. I've struggled some time before I got everything working, so here are my results. :) </description><pubDate>Sat, 10 Jan 2015 23:00:00 Z</pubDate><a10:updated>2015-01-10T23:00:00Z</a10:updated><a10:content type="html">&lt;p&gt;In this posting I will show you how to configure Rhino Security infrastructure to work with StructureMap IoC container and provide to you database schema (for MSSQL and &lt;a href="http://bojanv91.github.io/2014/12/database-development-guidance/"&gt;FluentMigrator&lt;/a&gt;) that you will need in order Rhino Security to get working. I've struggled some time before I got everything working, so here are my results. :) &lt;!--excerpt--&gt;&lt;/p&gt;
+<rss xmlns:a10="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Bojan Veljanovski's notes and thoughts on software</title><link>http://bojanv91.github.io/rss.xml</link><description>Bojan Veljanovski's notes and thoughts on software</description><item><guid isPermaLink="true">http://bojanv91.github.io/2015/03/beginners-installation-guide-to-bower-on-windows/</guid><link>http://bojanv91.github.io/2015/03/beginners-installation-guide-to-bower-on-windows/</link><title>Beginners installation guide to Bower on Windows</title><description>&lt;p&gt;&lt;a href="http://www.bower.io/"&gt;Bower&lt;/a&gt; is a package manger for the web. It makes installing frameworks, libraries and assets easy and straightforward. Automatically resolves package dependencies to other packages. For example, if you install twitter-bootstrap it would automatically install jquery for you, because bootstrap is dependent on jquery. Additionally it gives you version control out of the box for your packages, thus easier installing of updates. So, here is step-by-step guide into installing Bower and prerequisites on Windows. </description><pubDate>Sat, 21 Mar 2015 23:00:00 Z</pubDate><a10:updated>2015-03-21T23:00:00Z</a10:updated><a10:content type="html">&lt;p&gt;&lt;a href="http://www.bower.io/"&gt;Bower&lt;/a&gt; is a package manger for the web. It makes installing frameworks, libraries and assets easy and straightforward. Automatically resolves package dependencies to other packages. For example, if you install twitter-bootstrap it would automatically install jquery for you, because bootstrap is dependent on jquery. Additionally it gives you version control out of the box for your packages, thus easier installing of updates. So, here is step-by-step guide into installing Bower and prerequisites on Windows. &lt;!--excerpt--&gt; &lt;/p&gt;
+
+&lt;p&gt;Bower installs all packages under a single folder called bower_components, and holds dependency information in a bower.json file (among other project information).&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://bojanv91.github.io/images/2015-03-22-beginners-installation-guide-to-bower-on-windows/Screenshot_1.png" alt="bower initial folder structure" /&gt;&lt;/p&gt;
+
+&lt;p&gt;Bower depends on NPM and GIT, so you have to install them first.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Recommendation: Working with Bower is done via command line tool. So, I recommend installing more advanced command line utility in order to get happier with some neat features, as &lt;a href="http://www.hanselman.com/blog/Console2ABetterWindowsCommandPrompt.aspx"&gt;Scott Hanselman blogged about Console2&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1&gt;Installing Bower and it's prerequisites&lt;/h1&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Open CMD&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Install Chocolatey&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@powershell -NoProfile -ExecutionPolicy unrestricted -Command "(iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))) &amp;gt;$null 2&amp;gt;&amp;amp;1" &amp;amp;&amp;amp; SET PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Install GIT (or &lt;a href="http://git-scm.com/downloads"&gt;http://git-scm.com/downloads&lt;/a&gt;)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;choco install git.install 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;wait until installation is finished  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;setx path "%path%;C:\Program Files (x86)\Git\bin\"
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Install NodeJS (or &lt;a href="https://nodejs.org/download/"&gt;https://nodejs.org/download/&lt;/a&gt;)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;choco install nodejs.install
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;wait until installation is finished&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;setx path "%path%;C:\Program Files\nodejs\"
+setx path "%path%;C:\Users\%username%\AppData\Roaming\npm"
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;npm install -g bower&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;Profit!&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;If everything went fine you should be able to user "bower" command in CMD.&lt;/p&gt;
+
+&lt;p&gt;FAQ&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;What is Chocolatey?&lt;br /&gt;
+Chocolatey is a Machine Package Manager, somewhat like apt-get, but built with Windows in mind.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;What is NodeJS?&lt;br /&gt;
+Node.js is a platform built on Chrome's JavaScript runtime for easily building fast, scalable network applications.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;What is NPM (Node Package Manager)?&lt;br /&gt;
+NPM is a package manager for JavaScript, and is the default for Node.js&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;What is NuGet?&lt;br /&gt;
+NuGet is package manager for Microsoft development platform including .NET&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;What is PATH?&lt;br /&gt;
+PATH is an environment variable on Unix-like operating systems, DOS, OS/2, and Microsoft Windows, specifying a set of directories where executable programs are located. In our case, we added the locations of GIT and NPM executables in PATH env variable in order to be able to use them directly in CMD.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;From where bower downloads packages?&lt;br /&gt;
+bower install jquery (from registered packages in bower repository)&lt;br /&gt;
+bower install git://github.com/user/package.git (from GitHub)&lt;br /&gt;
+bower install user/package (from GitHub - with shorthand syntax)  &lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;What is the simplest way in order to make my custom package publicly available via Bower?&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Include bower.json manifest in the root folder&lt;/li&gt;
+&lt;li&gt;Push it to GitHub repository&lt;/li&gt;
+&lt;li&gt;Profit!  &lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Having more questions, you can reach me out on twitter @bojanv91 &lt;/p&gt;
+</a10:content></item><item><guid isPermaLink="true">http://bojanv91.github.io/2015/01/getting-started-with-rhino-security-structuremap/</guid><link>http://bojanv91.github.io/2015/01/getting-started-with-rhino-security-structuremap/</link><title>Getting Started with Rhino Security and Structure Map</title><description>&lt;p&gt;In this posting I will show you how to configure Rhino Security infrastructure to work with StructureMap IoC container and provide to you database schema (for MSSQL and &lt;a href="http://bojanv91.github.io/2014/12/database-development-guidance/"&gt;FluentMigrator&lt;/a&gt;) that you will need in order Rhino Security to get working. I've struggled some time before I got everything working, so here are my results. :) </description><pubDate>Sat, 10 Jan 2015 23:00:00 Z</pubDate><a10:updated>2015-01-10T23:00:00Z</a10:updated><a10:content type="html">&lt;p&gt;In this posting I will show you how to configure Rhino Security infrastructure to work with StructureMap IoC container and provide to you database schema (for MSSQL and &lt;a href="http://bojanv91.github.io/2014/12/database-development-guidance/"&gt;FluentMigrator&lt;/a&gt;) that you will need in order Rhino Security to get working. I've struggled some time before I got everything working, so here are my results. :) &lt;!--excerpt--&gt;&lt;/p&gt;
 
 &lt;blockquote&gt;
   &lt;p&gt;&lt;a href="https://github.com/ayende/rhino-security"&gt;Rhino Security&lt;/a&gt; is a security framework to provide row level security for NHibernate. Rhino Security is perfect for people who want to set up user and group security in their NHibernate domain models. &lt;/p&gt;

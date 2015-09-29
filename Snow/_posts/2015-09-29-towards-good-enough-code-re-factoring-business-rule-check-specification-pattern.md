@@ -3,7 +3,7 @@ layout: post
 title: Towards good enough code: Re-factoring a business rule check with the Specification Pattern
 ---
 
-The other day, one of my colleges asked me for a code review on a specific part of code that was written and I said let's dig a little deeper into the options that we have. In this article I demonstrate the re-factoring steps in detail that we've taken and eventually employed the `Specification Pattern`. Have in mind that, I choose a very basic example in order to keep things simple and avoid confusion that can be arouse from domain complexity.
+The other day, one of my colleges asked me for a code review on a specific part of code that was written and I said let's dig a little deeper into the options that we have. In this article I demonstrate the re-factoring steps in detail that we've taken and eventually employed the `Specification Pattern` <!--excerpt-->. Have in mind that, I choose a very basic example in order to keep things simple and avoid confusion that can be arouse from domain complexity.
 
 Here is the original code:  
   	
@@ -45,7 +45,7 @@ Also, I provide here the `tl;dr;` version of the code:
 	if (numberOfSameCompanies > 0)
 		throw new Exception("A company with the same name and country already exists");
 
-The above NHibernate query executes `SQL COUNT` query to database and retrieves the number of companies satisfying the specification. Performance issues solved.
+The above query retrieves the number of companies satisfying the given `where` condition. Performance issues solved.
 
 ## Step 2 - make the `if` condition check explicit 
 	
@@ -55,6 +55,8 @@ The above NHibernate query executes `SQL COUNT` query to database and retrieves 
 	var doesCompanyAlreadyExists = numberOfSameCompanies > 0;
 	if (doesCompanyAlreadyExists)
 		throw new Exception("A company with the same name and country already exists");
+
+By making some conditions explicit, we gain clear understanding about what the code does.
 
 ## Step 3 - make the business rule violation explicit 
 
@@ -84,7 +86,7 @@ Specification is a tactical design pattern presented in Eric Evans’ book Domai
   
 Here you can see how it is used:
 
-	var spec = new UniqueCompanySpecification(session);
+	var spec = new UniqueCompanySpecification(_companyRepository);
 	if (spec.IsSatisfiedBy(newCompany) == false)
 		throw new CompanyAlreadyExistsException();
 
@@ -120,7 +122,7 @@ After all re-factoring steps the final code is as follows:
 
 	var newCompany = new Company(message.Name, message.CountryId);
 	
-	var spec = new UniqueCompanySpecification(session);
+	var spec = new UniqueCompanySpecification(_companyRepository);
 	if (spec.IsSatisfiedBy(newCompany) == false)
 		throw new CompanyAlreadyExistsException();
 

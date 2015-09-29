@@ -97,9 +97,9 @@ if (spec.IsSatisfiedBy(newCompany) == false)
 
 &lt;pre&gt;&lt;code&gt;public class UniqueCompanySpecification : ISpecification&amp;lt;Company&amp;gt;
 {
-    readonly ISession _companyRepository;
+    readonly ICompanyRepository _companyRepository;
 
-    public UniqueCompanySpecification(CompanyRepository companyRepository)
+    public UniqueCompanySpecification(ICompanyRepository companyRepository)
     {
         _companyRepository = companyRepository;
     }

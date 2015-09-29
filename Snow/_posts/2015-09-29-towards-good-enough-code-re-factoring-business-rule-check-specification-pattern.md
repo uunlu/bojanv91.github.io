@@ -94,9 +94,9 @@ And the implementation details:
 	
 	public class UniqueCompanySpecification : ISpecification<Company>
 	{
-		readonly ISession _companyRepository;
+		readonly ICompanyRepository _companyRepository;
 
-		public UniqueCompanySpecification(CompanyRepository companyRepository)
+		public UniqueCompanySpecification(ICompanyRepository companyRepository)
 		{
 			_companyRepository = companyRepository;
 		}

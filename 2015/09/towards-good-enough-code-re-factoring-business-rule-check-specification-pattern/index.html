@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <meta http-equiv="last-modified" content="2015-09-29T14:28:30.8634485+02:00" />
+    <meta http-equiv="last-modified" content="2015-09-29T14:39:24.6238723+02:00" />
     <meta name="keywords" content="" />
     <title>Towards good enough code: Re-factoring a business rule check with the Specification Pattern Bojan Veljanovski's Blog</title>
     <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
@@ -156,9 +156,9 @@ if (spec.IsSatisfiedBy(newCompany) == false)
 
 <pre><code>public class UniqueCompanySpecification : ISpecification&lt;Company&gt;
 {
-    readonly ISession _companyRepository;
+    readonly ICompanyRepository _companyRepository;
 
-    public UniqueCompanySpecification(CompanyRepository companyRepository)
+    public UniqueCompanySpecification(ICompanyRepository companyRepository)
     {
         _companyRepository = companyRepository;
     }

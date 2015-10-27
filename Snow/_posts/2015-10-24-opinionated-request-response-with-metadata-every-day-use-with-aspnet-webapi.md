@@ -5,9 +5,9 @@ title: Opinionated Request/Response objects with Metadata for every-day use with
 
 In this article, I will try to explain how I design and use `Request / Response` classes in my default web API design approach.
 
-Working with web apps, I can see some usage patterns emerge in how we structure the `Response` classes. The most common response structures can be segregated in 3 forms: single, paged list and errors response. Besides the actual data, now days we also need additional context information or with other words - metadata. Let's dive in. <!--excerpt-->
+Working with web apps, I have witnessed some usage patterns emerge in how we structure the `Response` classes. The most common response structures can be segregated in 3 forms: single, paged list and error responses. Besides the actual data, now days we also need additional context information or in another word - metadata. Let's dive in. <!--excerpt-->
 
-> [Request/Response design pattern](http://www.servicedesignpatterns.com/ClientServiceInteractions/RequestResponse) is the most common pattern used in client-server interactions. It is used when the client must have an immediate response or wants the service to complete a task without delay. Request/Response begins when the client establishes a connection to the service. Once a connection has been established, the client sends its request and waits for a response. The service processes the request as soon as it is received and returns a response over the same connection.
+> [Request/Response design pattern](http://www.servicedesignpatterns.com/ClientServiceInteractions/RequestResponse) is the most common pattern used in client-server interactions. It is used when a client must have an immediate response or wants the service to complete a task without delay. Request/Response begins when a client establishes a connection to the service. Once a connection is established, the client sends its request and waits for a response. The service processes the request as soon as it receives and returns a response over the same connection.
 
 Wikipedia explanation about metadata:
 
@@ -20,17 +20,17 @@ Wikipedia explanation about metadata:
 ### Request
 
 Request data comes in two ways in HTTP APIs: form body or query string.
-Luckily ASP.NET model binders are smart enough to understand how de-serialize form body or query string data to .NET CLR classes.
+Luckily, ASP.NET model binders are smart enough in understanding how to de-serialize form body or query string data into .NET CLR classes.
 
 ### Response: Single
 
-In this example, user's intent is to create new person by specifying first and last name.
+In this example, user's intention is to create a new person by specifying first and last names.
 
 **POST Request - URI: api/people**
 
 	{
 		"firstName": "Pece",
-        "lastName": "Deteto"
+                "lastName": "Deteto"
 	}
 
 **POST Response - HTTP Status Code: 200**
@@ -42,11 +42,11 @@ In this example, user's intent is to create new person by specifying first and l
         "personId": 1,
     }
 
-As a response the server returns the newly created person ID and metadata containing a success message. Returning such response makes things easier for the client apps developers. Why we are returning the person's ID is a common understanding, but why we are returning a message text stating the success of the operation is more interesting. 
-We keep all success and error messages on the server, easily i18n-ed so the client apps don't need manage them at all. Let's say you have Android, iPhone, Windows Phone and Web App as consumers of your API. You want consistency in the operation messages (among other things), and you don't want to manage them on all platforms. API's messages are the source of truth. 
-Why I am embedding `message` into `metadata` field? Why the `metadata` field? - It's simple, I don't know what the future requirements may give to us, so I make this assumption that in future requirement additional fields will be needed besides a `message` . Maybe you are making use of some parts of Hypermedia and you'll need to send the fields label names with their data types to your smart client, which can compose it's UI from the metadata. Maybe. This way I am sure that I reduce the risk of breaking changes.
+The server returns the newly created person ID and the metadata containing a success message in its response. Returning such a response makes things easier for client app developers. Why we are returning the person's ID is a common understanding, but why we are returning a message text stating the success of the operation is more interesting. 
+We keep all success and error messages on the server, easily i18n-ed so the client apps don't need to manage them at all. Let's say you have Android, iPhone, Windows Phone and Web Apps as consumers of your API. You want consistency in the operation messages (among other things), and you don't want to manage them seprately for all those platforms. API's messages are the source of truth. 
+Why am I embedding `message` into `metadata` field? - It's simple, I don't know what the future requirements will be, thus, I make this assumption that in future requirement changes, some additional fields can be needed other than a simple `message` . Perhaps, you are making use of some parts of Hypermedia and you'll need to send the fields label names with their data types to your smart client, which can compose it's UI from the metadata. Maybe. This way, I am sure that I reduce the risk of breaking my code.
 
-Now let's look into the `metadata` usage for paged list items.
+Now, let's look into the `metadata` usage for paged list items.
 
 ### Response: Paged list
 
@@ -59,7 +59,7 @@ Now let's look into the `metadata` usage for paged list items.
         "sortDirection": "asc",
 	}
 
-This request ultimately is sent as a query string:
+This request is ultimately sent as a query string:
 
 	http://DOMAIN/api/people?pageNumber=1&pageSize=10&sortBy=firstName&sortDirection=asc
 
@@ -91,7 +91,7 @@ This request ultimately is sent as a query string:
         ]
     }
 
-I'll leave it to yourself, dear reader, how smart your client apps can be with this just enough metadata.
+I'll leave the rest to yourself, dear reader, how smart your client apps can be with this 'just enough' metadata.
 
 ### Response: Error
 
@@ -120,7 +120,7 @@ I'll leave it to yourself, dear reader, how smart your client apps can be with t
 
 ### Web API HTTP Status Codes
 
-As it can be concluded from the above examples - most commonly I map the outcome from application operations to status codes like this:
+As it can be concluded from the above examples - most commonly, I map the outcome from application operations to status codes like this:
 
 - 200 when the operation completes successfully
 - 400 when input validation or business logic error occurs
@@ -161,7 +161,7 @@ As it can be concluded from the above examples - most commonly I map the outcome
         }
     }
 
-*In the example above I make use of Command and Query pattern. I'll explain how I use it in my next article.*
+*In the example above, I make use of Command and Query pattern. I'll explain how to use it in my next article.*
 
 ### The Request/Response classes
 
@@ -209,7 +209,7 @@ You can generate your API documentation with [Swashbuckle](https://www.nuget.org
 
 ### The Front-End Client with jQuery
 
-The following is small piece of code service method demonstrating how you can work with our Web API with jQuery.
+The following is a small piece of code service method demonstrating how you can work with our Web API with jQuery.
 
 	//HTML
 	<form id="#createUserForm">
@@ -266,5 +266,5 @@ The following is small piece of code service method demonstrating how you can wo
 			});
 	});
 
-In the next article I will dig deeper in how I use Command and Query pattern in my applications.
+In the next article, I will dig deeper into how to use Command and Query pattern in applications.
 

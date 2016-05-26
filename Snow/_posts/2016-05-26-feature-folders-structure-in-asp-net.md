@@ -98,7 +98,6 @@ Food for thought:
 - What if we put our JavaScript files also in these feature folders?
 - What if one feature folder becomes so demanding on the UI that needs to be a full SPA view/module - can we structure it to use Angular (or React, or whatever)?
 
-
     ShoppingCart
         Components
             CartComponent.js
@@ -110,7 +109,6 @@ Food for thought:
         App.css
         Index.cshtml
         ShoppingCartController.cs
-
 
 # Configuration
 

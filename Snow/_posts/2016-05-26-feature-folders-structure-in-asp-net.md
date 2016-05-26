@@ -5,14 +5,14 @@ title: "Feature Folders" structure in ASP.NET MVC
 
 DRAFT
 
-Structuring things around **business concerns** is more convenient and natural than structuring them around **technical concerns**. In both ways, [Separation of Concerns](http://deviq.com/separation-of-concerns/) is applied, but from which point of view a better structure is achieved at this level?<!--excerpt-->
+Structuring things around **business concerns** is more convenient and natural than structuring them around **technical concerns**. Although, both ways apply and satifsy [Separation of Concerns](http://deviq.com/separation-of-concerns/), why a better structure is achieved when structuring is built on business concerns?<!--excerpt-->
 
-How changing requirements usually come from project managers?
+How do project managers ask for changes in requirements?
 
 - Change these fields in all these views; all these models; all these controllers, or
 - Change these fields in customer registration; shopping cart payment; ...
 
-Most of the time developers make modifications scoped to a single feature (e.g. adding new field). Structuring the related files under single folder, can make this simpler. By applying the rule *"Files that change together should be structured close together"*, we can easily see the default MVC folder structure violates it. That is why structuring by business concerns is extremelly important aspect.
+Most of the time developers make modifications related to a single feature (e.g. adding new field). Structuring the related files in a single folder, can help modify change requests easier. It can be easily seen that the default MVC folder structure violates the rule of *"Files that change together should be structured close together"*. That is why structuring by business concerns instead of technical concerns is extremely important.
 
 Let's see both examples. 
 
